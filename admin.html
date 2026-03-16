@@ -273,6 +273,30 @@
       word-break: break-word;
     }
     .player-teams-summary span { white-space: nowrap; }
+    .clear-player-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
+      opacity: 0.4;
+      transition: opacity 0.15s, color 0.15s;
+    }
+    .clear-player-btn:hover { opacity: 1; color: #d32f2f; }
+    .clear-all-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .clear-all-btn:hover { opacity: 1; color: #d32f2f; border-color: #d32f2f; }
 
     /* Final Four Matchups */
     .ff-matchups-editor {
@@ -357,7 +381,17 @@
       font-size: 0.8rem;
       color: var(--text-dim);
     }
-    #status-bar .status-text.success { color: var(--win); }
+    #status-bar .status-text.success { color: #2e7d32; }
+    #snapshot-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      max-width: 180px;
+    }
 
     @media (max-width: 600px) {
       .admin-section { margin: 10px; }
@@ -372,6 +406,7 @@
   <header>
     <h1>Admin Panel</h1>
     <nav id="main-nav">
+      <select id="year-select" title="Select year"></select>
       <a href="index.html" class="tab">Back to Site</a>
       <button class="tab" id="logout-btn" style="display:none;">Logout</button>
     </nav>
@@ -392,7 +427,10 @@
     <div class="admin-section">
       <div class="admin-section-header" data-section="players">
         <h2>Players</h2>
-        <span class="toggle-icon">&#9660;</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="clear-all-btn" id="clear-all-teams">Clear All Rosters</button>
+          <span class="toggle-icon">&#9660;</span>
+        </div>
       </div>
       <div class="admin-section-body" id="players-body">
         <div class="player-grid" id="player-grid"></div>
@@ -444,7 +482,13 @@
   <!-- Status Bar -->
   <div id="status-bar" style="display:none;">
     <span class="status-text" id="status-text">Ready</span>
-    <button class="admin-btn" id="generate-btn-bar">Generate JSON</button>
+    <div style="display:flex;gap:6px;align-items:center">
+      <select id="snapshot-select" title="Load snapshot">
+        <option value="">Snapshots...</option>
+      </select>
+      <button class="admin-btn secondary" id="save-snapshot-btn">Save Snapshot</button>
+      <button class="admin-btn" id="generate-btn-bar">Generate JSON</button>
+    </div>
   </div>
 
   <script>
@@ -500,8 +544,27 @@
     /* ── Data Loading ── */
 
     async function loadAndRender() {
-      var year = new URLSearchParams(window.location.search).get('year') || '2026';
-      var resp = await fetch('data/' + year + '.json');
+      var years;
+      try {
+        var yResp = await fetch('data/years.json');
+        years = await yResp.json();
+      } catch(e) { years = [2026]; }
+      years.sort(function(a, b) { return b - a; });
+
+      var paramYear = new URLSearchParams(window.location.search).get('year');
+      var currentYear = paramYear ? parseInt(paramYear, 10) : years[0];
+
+      var sel = document.getElementById('year-select');
+      sel.innerHTML = years.map(function(y) {
+        return '<option value="' + y + '"' + (y === currentYear ? ' selected' : '') + '>' + y + '</option>';
+      }).join('');
+      sel.addEventListener('change', function() {
+        var url = new URL(window.location);
+        url.searchParams.set('year', sel.value);
+        window.location = url;
+      });
+
+      var resp = await fetch('data/' + currentYear + '.json');
       DATA = await resp.json();
       renderAll();
     }
@@ -511,7 +574,23 @@
       renderDraft();
       renderFinalFourMatchups();
       clearExport();
+      refreshSnapshotSelect();
     }
+
+    /* ── Clear All Rosters ── */
+
+    document.getElementById('clear-all-teams').addEventListener('click', function(e) {
+      e.stopPropagation(); // don't toggle the section collapse
+      if (!confirm('Clear ALL rosters for every player?')) return;
+      for (var rn of Object.keys(DATA.regions)) {
+        for (var t of DATA.regions[rn]) {
+          t.owner = null;
+        }
+      }
+      renderPlayers();
+      renderDraft();
+      setStatus('Cleared all rosters', true);
+    });
 
     /* ── Section Collapse ── */
 
@@ -550,6 +629,9 @@
       grid.innerHTML = DATA.players.map(function(p, i) {
         var teams = getPlayerTeams(p.name);
         var summary = teams.length ? teams.join(', ') : '';
+        var clearBtn = teams.length
+          ? '<button class="clear-player-btn" data-idx="' + i + '" title="Clear all teams for ' + escapeAttr(p.name) + '">&times;</button>'
+          : '';
         return '<div class="player-row-wrap">' +
           '<div class="player-row-top">' +
             '<label>' + (i + 1) + '</label>' +
@@ -559,6 +641,7 @@
               '<input type="text" class="team-search" data-idx="' + i + '" placeholder="Add team...">' +
               '<div class="typeahead-list" data-idx="' + i + '"></div>' +
             '</div>' +
+            clearBtn +
           '</div>' +
           '<div class="player-teams-summary" data-idx="' + i + '">' + escapeHtml(summary) + '</div>' +
         '</div>';
@@ -587,6 +670,23 @@
         input.addEventListener('input', function(e) {
           DATA.players[+e.target.dataset.idx].color = e.target.value;
           renderDraft();
+        });
+      });
+
+      // Clear player teams
+      grid.querySelectorAll('.clear-player-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          var idx = +e.target.dataset.idx;
+          var name = DATA.players[idx].name;
+          if (!confirm('Clear all teams for ' + name + '?')) return;
+          for (var rn of Object.keys(DATA.regions)) {
+            for (var t of DATA.regions[rn]) {
+              if (t.owner === name) t.owner = null;
+            }
+          }
+          renderPlayers();
+          renderDraft();
+          setStatus('Cleared all teams for ' + name, true);
         });
       });
 
@@ -804,6 +904,61 @@
         });
       });
     }
+
+    /* ── Snapshots ── */
+
+    function snapshotKey() {
+      return 'mm_snapshots_' + (DATA ? DATA.year : '0');
+    }
+
+    function getSnapshots() {
+      try {
+        return JSON.parse(localStorage.getItem(snapshotKey())) || [];
+      } catch(e) { return []; }
+    }
+
+    function saveSnapshots(snapshots) {
+      localStorage.setItem(snapshotKey(), JSON.stringify(snapshots));
+    }
+
+    function refreshSnapshotSelect() {
+      var sel = document.getElementById('snapshot-select');
+      var snapshots = getSnapshots();
+      sel.innerHTML = '<option value="">Snapshots (' + snapshots.length + ')...</option>' +
+        snapshots.map(function(s, i) {
+          return '<option value="' + i + '">' + escapeHtml(s.name) + '</option>';
+        }).join('');
+    }
+
+    document.getElementById('save-snapshot-btn').addEventListener('click', function() {
+      var name = prompt('Snapshot name:', 'Snapshot ' + new Date().toLocaleString());
+      if (!name) return;
+      var snapshots = getSnapshots();
+      snapshots.push({
+        name: name,
+        date: new Date().toISOString(),
+        data: JSON.parse(JSON.stringify(DATA)),
+      });
+      saveSnapshots(snapshots);
+      refreshSnapshotSelect();
+      setStatus('Saved snapshot: ' + name, true);
+    });
+
+    document.getElementById('snapshot-select').addEventListener('change', function(e) {
+      var idx = e.target.value;
+      if (idx === '') return;
+      var snapshots = getSnapshots();
+      var snap = snapshots[+idx];
+      if (!snap) return;
+      if (!confirm('Load snapshot "' + snap.name + '"? This will replace your current work.')) {
+        e.target.value = '';
+        return;
+      }
+      DATA = JSON.parse(JSON.stringify(snap.data));
+      renderAll();
+      e.target.value = '';
+      setStatus('Loaded snapshot: ' + snap.name, true);
+    });
 
     /* ── Export ── */
 

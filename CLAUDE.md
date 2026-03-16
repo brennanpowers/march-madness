@@ -111,6 +111,19 @@ Team slots use the owner's color: 20% tint + 2px border for winners, 8% tint + 0
 
 `espn.js` must load first because it defines `hexToRgba()` and `teamLogoUrl()` used by all other scripts.
 
+## Tests
+
+```bash
+# Data integrity — validates all year JSON files against the schema
+python3 tests/test-data-integrity.py
+
+# Setup script — unit tests for backfill, FF detection, schedule building
+python3 tests/test-setup-script.py
+
+# Scoring engine — open in browser, exercises JS scoring/bracket logic
+open tests/test-scoring.html
+```
+
 ## Context Index
 
 - **espn-api** — Comprehensive reference for ESPN's undocumented APIs: endpoints, response structures, gotchas, year-to-year differences in headline formats, filtering strategies, and logo CDN

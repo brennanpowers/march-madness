@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tests — Scoring Engine</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+    .pass { color: #2e7d32; } .fail { color: #d32f2f; font-weight: bold; }
+    h2 { margin-top: 24px; } pre { background: #fff; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<h1>Scoring Engine Tests</h1>
+<div id="results"></div>
+
+<!-- Load app scripts in order (same as index.html) -->
+<script src="../js/espn.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/bracket.js"></script>
+<script src="../js/roster.js"></script>
+
+<script>
+// ── Test Framework ──
+let passed = 0, failed = 0;
+const out = document.getElementById('results');
+
+function assert(condition, msg) {
+  if (condition) {
+    passed++;
+    out.innerHTML += `<div class="pass">PASS: ${msg}</div>`;
+  } else {
+    failed++;
+    out.innerHTML += `<div class="fail">FAIL: ${msg}</div>`;
+  }
+}
+
+function assertEqual(actual, expected, msg) {
+  const ok = JSON.stringify(actual) === JSON.stringify(expected);
+  assert(ok, `${msg} — expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+}
+
+function section(name) {
+  out.innerHTML += `<h2>${name}</h2>`;
+}
+
+// ── Build test data ──
+function makeTestData() {
+  return {
+    year: 9999,
+    title: "Test Pool",
+    gameDates: [],
+    players: [
+      { name: "Alice", color: "#d32f2f" },
+      { name: "Bob", color: "#1565c0" },
+    ],
+    finalFourMatchups: [["South", "East"], ["Midwest", "West"]],
+    firstFour: [],
+    regions: {
+      South: Array.from({length: 16}, (_, i) => ({
+        seed: i + 1, name: `S${i+1}`, espnId: `s${i+1}`, abbrev: `S${i+1}`,
+        owner: i < 8 ? "Alice" : "Bob", firstFour: false,
+      })),
+      East: Array.from({length: 16}, (_, i) => ({
+        seed: i + 1, name: `E${i+1}`, espnId: `e${i+1}`, abbrev: `E${i+1}`,
+        owner: i < 8 ? "Bob" : "Alice", firstFour: false,
+      })),
+      Midwest: Array.from({length: 16}, (_, i) => ({
+        seed: i + 1, name: `M${i+1}`, espnId: `m${i+1}`, abbrev: `M${i+1}`,
+        owner: i < 8 ? "Alice" : "Bob", firstFour: false,
+      })),
+      West: Array.from({length: 16}, (_, i) => ({
+        seed: i + 1, name: `W${i+1}`, espnId: `w${i+1}`, abbrev: `W${i+1}`,
+        owner: i < 8 ? "Bob" : "Alice", firstFour: false,
+      })),
+    },
+    results: {
+      South:   { round1: [null,null,null,null,null,null,null,null], round2: [null,null,null,null], sweet16: [null,null], elite8: [null] },
+      East:    { round1: [null,null,null,null,null,null,null,null], round2: [null,null,null,null], sweet16: [null,null], elite8: [null] },
+      Midwest: { round1: [null,null,null,null,null,null,null,null], round2: [null,null,null,null], sweet16: [null,null], elite8: [null] },
+      West:    { round1: [null,null,null,null,null,null,null,null], round2: [null,null,null,null], sweet16: [null,null], elite8: [null] },
+      finalFour: [null, null],
+      championship: [null],
+    },
+    schedule: {
+      South: { round1: Array(8).fill(null), round2: Array(4).fill(null), sweet16: Array(2).fill(null), elite8: [null] },
+      East: { round1: Array(8).fill(null), round2: Array(4).fill(null), sweet16: Array(2).fill(null), elite8: [null] },
+      Midwest: { round1: Array(8).fill(null), round2: Array(4).fill(null), sweet16: Array(2).fill(null), elite8: [null] },
+      West: { round1: Array(8).fill(null), round2: Array(4).fill(null), sweet16: Array(2).fill(null), elite8: [null] },
+      finalFour: [null, null],
+      championship: [null],
+    },
+  };
+}
+
+// Remove DOMContentLoaded listener from app.js so it doesn't auto-init
+// (We control DATA manually in tests)
+
+// ── Tests ──
+
+section("BRACKET_ORDER");
+assertEqual(BRACKET_ORDER, [1,16,8,9,5,12,4,13,6,11,3,14,7,10,2,15], "Bracket seed order is correct");
+assertEqual(BRACKET_ORDER.length, 16, "Bracket order has 16 seeds");
+
+section("ROUND_MULTIPLIER");
+assertEqual(ROUND_MULTIPLIER.round1, 1, "Round of 64 multiplier = 1");
+assertEqual(ROUND_MULTIPLIER.round2, 2, "Round of 32 multiplier = 2");
+assertEqual(ROUND_MULTIPLIER.sweet16, 3, "Sweet 16 multiplier = 3");
+assertEqual(ROUND_MULTIPLIER.elite8, 4, "Elite 8 multiplier = 4");
+assertEqual(ROUND_MULTIPLIER.finalFour, 5, "Final Four multiplier = 5");
+assertEqual(ROUND_MULTIPLIER.championship, 6, "Championship multiplier = 6");
+
+section("computeScores — no results");
+DATA = makeTestData();
+let scores = computeScores();
+assertEqual(scores.length, 2, "Two players returned");
+assert(scores.every(s => s.score === 0), "All scores are 0 with no results");
+assertEqual(scores[0].teams.length, 32, "Each player has 32 teams (half of 64)");
+
+section("computeScores — 1-seed wins round 1");
+DATA = makeTestData();
+DATA.results.South.round1[0] = "S1"; // 1-seed wins slot 0 (1v16)
+scores = computeScores();
+let alice = scores.find(s => s.name === "Alice");
+assertEqual(alice.score, 1, "1-seed R64 win = 1 × 1 = 1 point");
+
+section("computeScores — 16-seed upset in round 1");
+DATA = makeTestData();
+DATA.results.South.round1[0] = "S16"; // 16-seed upsets 1-seed
+scores = computeScores();
+let bob = scores.find(s => s.name === "Bob"); // Bob owns seeds 9-16 in South
+assertEqual(bob.score, 16, "16-seed R64 win = 16 × 1 = 16 points");
+
+section("computeScores — deep run accumulates");
+DATA = makeTestData();
+// 12-seed wins R64, R32, S16
+DATA.results.South.round1[2] = "S12"; // slot 2 = 5v12, 12 wins
+DATA.results.South.round2[1] = "S12"; // slot 1 = winner of slot2 vs slot3
+DATA.results.South.sweet16[0] = "S12";
+// Need round1[3] for round2[1] to make sense
+DATA.results.South.round1[3] = "S4";
+// Need round2[0] for sweet16[0]
+DATA.results.South.round1[0] = "S1";
+DATA.results.South.round1[1] = "S8";
+DATA.results.South.round2[0] = "S1";
+scores = computeScores();
+bob = scores.find(s => s.name === "Bob"); // Bob owns S12 (seed 9-16)
+let s12points = 12*1 + 12*2 + 12*3; // 12 + 24 + 36 = 72
+let s12team = bob.teams.find(t => t.name === "S12");
+assertEqual(s12team.points, s12points, "12-seed through Sweet 16 = 12+24+36 = 72");
+
+section("computeScores — championship run");
+DATA = makeTestData();
+// 1-seed wins every round through championship
+DATA.results.South.round1[0] = "S1";
+DATA.results.South.round1[1] = "S8";
+DATA.results.South.round1[2] = "S5";
+DATA.results.South.round1[3] = "S4";
+DATA.results.South.round1[4] = "S6";
+DATA.results.South.round1[5] = "S3";
+DATA.results.South.round1[6] = "S7";
+DATA.results.South.round1[7] = "S2";
+DATA.results.South.round2[0] = "S1";
+DATA.results.South.round2[1] = "S4";
+DATA.results.South.round2[2] = "S3";
+DATA.results.South.round2[3] = "S2";
+DATA.results.South.sweet16[0] = "S1";
+DATA.results.South.sweet16[1] = "S2";
+DATA.results.South.elite8[0] = "S1";
+DATA.results.finalFour[0] = "S1";
+DATA.results.championship[0] = "S1";
+scores = computeScores();
+alice = scores.find(s => s.name === "Alice");
+let champPoints = 1*(1+2+3+4+5+6); // seed 1 × sum of all multipliers = 21
+let s1team = alice.teams.find(t => t.name === "S1");
+assertEqual(s1team.points, champPoints, "1-seed champion = 1×(1+2+3+4+5+6) = 21");
+
+section("isTeamEliminated");
+DATA = makeTestData();
+DATA.results.South.round1[0] = "S1"; // S16 is eliminated
+assert(isTeamEliminated("S16"), "S16 eliminated after losing R64");
+assert(!isTeamEliminated("S1"), "S1 not eliminated after winning R64");
+assert(!isTeamEliminated("S8"), "S8 not eliminated (game not played)");
+
+section("isTeamEliminated — later rounds");
+DATA = makeTestData();
+DATA.results.South.round1[0] = "S1";
+DATA.results.South.round1[1] = "S8";
+DATA.results.South.round2[0] = "S1"; // S8 eliminated in R32
+assert(isTeamEliminated("S8"), "S8 eliminated in Round of 32");
+assert(!isTeamEliminated("S1"), "S1 still active after R32 win");
+assert(isTeamEliminated("S16"), "S16 still shows eliminated");
+
+section("getTeamByName");
+DATA = makeTestData();
+let team = getTeamByName("S1");
+assertEqual(team.seed, 1, "getTeamByName finds correct team");
+assertEqual(team.name, "S1", "getTeamByName returns correct name");
+assertEqual(getTeamByName("NONEXISTENT"), null, "getTeamByName returns null for missing team");
+
+section("computeTeamWins");
+DATA = makeTestData();
+DATA.results.South.round1[0] = "S1";
+DATA.results.South.round1[1] = "S8";
+DATA.results.South.round2[0] = "S1";
+let wins = computeTeamWins("S1");
+assertEqual(wins, ["round1", "round2"], "S1 has wins in round1 and round2");
+assertEqual(computeTeamWins("S16"), [], "S16 has no wins (lost R64)");
+assertEqual(computeTeamWins("S5"), [], "S5 has no wins (game not played)");
+
+section("hexToRgba");
+assertEqual(hexToRgba("#ff0000", 0.5), "rgba(255,0,0,0.5)", "Red at 50%");
+assertEqual(hexToRgba("#000000", 1), "rgba(0,0,0,1)", "Black at 100%");
+assertEqual(hexToRgba("#1565c0", 0.2), "rgba(21,101,192,0.2)", "Blue at 20%");
+
+section("teamLogoUrl");
+assertEqual(teamLogoUrl("150"), "img/logos/150.png", "Logo URL for ESPN ID 150");
+assertEqual(teamLogoUrl(null), null, "Logo URL returns null for null ID");
+assertEqual(teamLogoUrl(""), null, "Logo URL returns null for empty ID");
+
+section("formatGameTime");
+let d = new Date("2026-03-19T18:50:00Z");
+let formatted = formatGameTime("2026-03-19T18:50:00Z", true);
+assert(formatted.includes("Final"), "Completed game shows Final");
+let pending = formatGameTime("2026-03-19T18:50:00Z", false);
+assert(!pending.includes("Final"), "Pending game does not show Final");
+assert(pending.includes("Mar"), "Pending game shows month");
+
+// ── Summary ──
+out.innerHTML += `<h2>Summary</h2>`;
+out.innerHTML += `<div class="${failed ? 'fail' : 'pass'}">${passed} passed, ${failed} failed</div>`;
+document.title = `Tests: ${passed} passed, ${failed} failed`;
+</script>
+</body>
+</html>
