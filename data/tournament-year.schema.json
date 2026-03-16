@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tournament-year.schema.json",
+  "title": "Tournament Year",
+  "description": "Complete tournament data for a single year: bracket, rosters, schedule, and results.",
+  "type": "object",
+  "required": [
+    "year",
+    "title",
+    "gameDates",
+    "players",
+    "finalFourMatchups",
+    "firstFour",
+    "regions",
+    "results",
+    "schedule"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "year": {
+      "type": "integer",
+      "minimum": 2000,
+      "maximum": 2099,
+      "description": "Four-digit tournament year"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display title (e.g. 'March Madness Pool 2026')"
+    },
+    "gameDates": {
+      "type": "array",
+      "description": "YYYYMMDD date strings for ESPN API scoreboard fetches. Chronologically ordered.",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]{8}$"
+      },
+      "minItems": 1
+    },
+    "players": {
+      "type": "array",
+      "description": "Pool participants. Always exactly 8.",
+      "items": { "$ref": "#/$defs/Player" },
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "finalFourMatchups": {
+      "type": "array",
+      "description": "Two pairs of region names that face each other in the Final Four.",
+      "items": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/RegionName" },
+        "minItems": 2,
+        "maxItems": 2
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "firstFour": {
+      "type": "array",
+      "description": "First Four play-in games. Always exactly 4.",
+      "items": { "$ref": "#/$defs/FirstFourGame" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "regions": {
+      "type": "object",
+      "description": "Four tournament regions, each with 16 seeded teams.",
+      "required": ["South", "East", "Midwest", "West"],
+      "additionalProperties": false,
+      "properties": {
+        "South": { "$ref": "#/$defs/Region" },
+        "East": { "$ref": "#/$defs/Region" },
+        "Midwest": { "$ref": "#/$defs/Region" },
+        "West": { "$ref": "#/$defs/Region" }
+      }
+    },
+    "results": {
+      "type": "object",
+      "description": "Game winners per round. null for unplayed games, team name string for completed.",
+      "required": ["South", "East", "Midwest", "West", "finalFour", "championship"],
+      "additionalProperties": false,
+      "properties": {
+        "South": { "$ref": "#/$defs/RegionResults" },
+        "East": { "$ref": "#/$defs/RegionResults" },
+        "Midwest": { "$ref": "#/$defs/RegionResults" },
+        "West": { "$ref": "#/$defs/RegionResults" },
+        "finalFour": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Final Four semifinal winners"
+        },
+        "championship": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 1,
+          "maxItems": 1,
+          "description": "Championship game winner"
+        }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "description": "Game times per slot. Mirrors results structure with ISO-8601 UTC datetimes.",
+      "required": ["South", "East", "Midwest", "West", "finalFour", "championship"],
+      "additionalProperties": false,
+      "properties": {
+        "South": { "$ref": "#/$defs/RegionSchedule" },
+        "East": { "$ref": "#/$defs/RegionSchedule" },
+        "Midwest": { "$ref": "#/$defs/RegionSchedule" },
+        "West": { "$ref": "#/$defs/RegionSchedule" },
+        "finalFour": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Final Four game times"
+        },
+        "championship": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 1,
+          "maxItems": 1,
+          "description": "Championship game time"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "RegionName": {
+      "type": "string",
+      "enum": ["South", "East", "Midwest", "West"]
+    },
+    "NullableString": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "null" }
+      ]
+    },
+    "NullableISODatetime": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}Z$",
+          "description": "ISO-8601 UTC datetime at minute precision (YYYY-MM-DDTHH:mmZ)"
+        },
+        { "type": "null" }
+      ]
+    },
+    "HexColor": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$",
+      "description": "6-digit hex color code"
+    },
+    "EspnId": {
+      "description": "ESPN numeric team ID as a string, or null for unresolved First Four slots",
+      "oneOf": [
+        { "type": "string", "pattern": "^[0-9]+$" },
+        { "type": "null" }
+      ]
+    },
+    "Player": {
+      "type": "object",
+      "required": ["name", "color"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name (generic 'Player N' before draft, real name after)"
+        },
+        "color": {
+          "$ref": "#/$defs/HexColor",
+          "description": "Hex color from the 8-color pool palette"
+        }
+      }
+    },
+    "FirstFourGame": {
+      "type": "object",
+      "required": [
+        "team1", "team1EspnId", "team1Abbrev",
+        "team2", "team2EspnId", "team2Abbrev",
+        "region", "seed", "winner"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "team1": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full name of the first team"
+        },
+        "team1EspnId": {
+          "type": "string",
+          "pattern": "^[0-9]+$",
+          "description": "ESPN numeric team ID"
+        },
+        "team1Abbrev": {
+          "type": "string",
+          "minLength": 1,
+          "description": "ESPN abbreviation"
+        },
+        "team2": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full name of the second team"
+        },
+        "team2EspnId": {
+          "type": "string",
+          "pattern": "^[0-9]+$",
+          "description": "ESPN numeric team ID"
+        },
+        "team2Abbrev": {
+          "type": "string",
+          "minLength": 1,
+          "description": "ESPN abbreviation"
+        },
+        "region": {
+          "$ref": "#/$defs/RegionName",
+          "description": "Region the winner enters"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "Seed number the winner occupies"
+        },
+        "winner": {
+          "$ref": "#/$defs/NullableString",
+          "description": "Winning team name, or null if unplayed"
+        }
+      }
+    },
+    "Team": {
+      "type": "object",
+      "required": ["seed", "name", "espnId", "abbrev", "owner", "firstFour"],
+      "additionalProperties": false,
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "Tournament seed"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Team display name. Combined 'Team A / Team B' for unresolved First Four slots."
+        },
+        "espnId": {
+          "$ref": "#/$defs/EspnId"
+        },
+        "abbrev": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ],
+          "description": "ESPN abbreviation, or null for unresolved First Four slots"
+        },
+        "owner": {
+          "$ref": "#/$defs/NullableString",
+          "description": "Name of the pool player who drafted this team, or null"
+        },
+        "firstFour": {
+          "type": "boolean",
+          "description": "Whether this slot is a First Four play-in"
+        }
+      }
+    },
+    "Region": {
+      "type": "array",
+      "description": "16 teams in seed order (index 0 = seed 1, index 15 = seed 16)",
+      "items": { "$ref": "#/$defs/Team" },
+      "minItems": 16,
+      "maxItems": 16
+    },
+    "RegionResults": {
+      "type": "object",
+      "required": ["round1", "round2", "sweet16", "elite8"],
+      "additionalProperties": false,
+      "properties": {
+        "round1": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 8,
+          "maxItems": 8,
+          "description": "Round of 64 winners. Index mapping: [0]=1v16, [1]=8v9, [2]=5v12, [3]=4v13, [4]=6v11, [5]=3v14, [6]=7v10, [7]=2v15"
+        },
+        "round2": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "Round of 32 winners"
+        },
+        "sweet16": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Sweet 16 winners"
+        },
+        "elite8": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableString" },
+          "minItems": 1,
+          "maxItems": 1,
+          "description": "Elite 8 winner (region champion)"
+        }
+      }
+    },
+    "RegionSchedule": {
+      "type": "object",
+      "required": ["round1", "round2", "sweet16", "elite8"],
+      "additionalProperties": false,
+      "properties": {
+        "round1": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 8,
+          "maxItems": 8
+        },
+        "round2": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "sweet16": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "elite8": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/NullableISODatetime" },
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    }
+  }
+}

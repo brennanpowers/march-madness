@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "years.schema.json",
+  "title": "Years Manifest",
+  "description": "Descending-sorted array of available tournament years. Drives the year-selector dropdown.",
+  "type": "array",
+  "items": {
+    "type": "integer",
+    "minimum": 2000,
+    "maximum": 2099
+  },
+  "minItems": 1,
+  "uniqueItems": true
+}

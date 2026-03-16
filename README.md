@@ -85,17 +85,24 @@ marchmadness/
 │   ├── bracket.js          # Region bracket rendering with logos and connectors
 │   └── roster.js           # Player roster cards with team lists
 ├── data/
-│   ├── years.json          # Array of available years (drives the year dropdown)
-│   ├── 2026.json           # Current year tournament data
-│   ├── 2025.json           # Historical data
-│   └── 2024.json           # Historical data
+│   ├── years.json                  # Array of available years (drives the year dropdown)
+│   ├── years.schema.json           # JSON Schema for years.json
+│   ├── tournament-year.schema.json # JSON Schema for <year>.json files
+│   ├── 2026.json                   # Current year tournament data
+│   ├── 2025.json                   # Historical data
+│   └── 2024.json                   # Historical data
 ├── img/
 │   └── logos/              # Cached team logo PNGs ({espnId}.png)
 ├── scripts/
 │   ├── setup-year.py       # One-stop setup: bracket + logos + results + years manifest
 │   └── generate_bracket.py # Core bracket generator (ESPN API -> tournament JSON)
+├── tests/
+│   ├── test-data-integrity.py  # Validates all year JSON files against schemas
+│   ├── test-setup-script.py    # Unit tests for setup script
+│   └── test-scoring.html       # Browser-based scoring engine tests
+├── requirements-dev.txt        # Python dev dependencies (jsonschema)
 └── docs/
-    ├── espn-core-v2.wadl   # ESPN API endpoint documentation (machine-readable)
+    ├── espn-core-v2.wadl       # ESPN API endpoint documentation (machine-readable)
     └── espn-core-v3.wadl
 ```
 
@@ -183,10 +190,12 @@ Each year's JSON (`data/<year>.json`) contains:
 
 Results use `null` for unplayed games. The client fills these in at runtime from ESPN data.
 
+Formal JSON Schema definitions live alongside the data files: `data/tournament-year.schema.json` and `data/years.schema.json`. The integrity test (`tests/test-data-integrity.py`) validates all data files against these schemas.
+
 ## Tech Stack
 
 - **HTML/CSS/JS** -- no build step, no framework, no dependencies
-- **Python 3** -- setup scripts (standard library only, no pip packages)
+- **Python 3** -- setup scripts (standard library only) and test tooling (`pip install -r requirements-dev.txt`)
 - **ESPN undocumented APIs** -- Core API for bracket building, Site API for live scores
 - **GitHub Pages** -- hosting and deployment
 - **Custom domain** -- `marchmadness.brennanpowers.com` via CNAME

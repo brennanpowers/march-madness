@@ -718,8 +718,8 @@
             item.addEventListener('mousedown', function(e) {
               e.preventDefault();
               assignTeam(idx, item.dataset.teamName, item.dataset.region, +item.dataset.seed);
-              input.value = '';
-              list.classList.remove('open');
+              const refocused = document.querySelector('.team-search[data-idx="' + idx + '"]');
+              if (refocused) refocused.focus();
             });
           });
         });
@@ -740,8 +740,8 @@
             const sel = activeIndex >= 0 ? items[activeIndex] : items[0];
             if (sel) {
               assignTeam(idx, sel.dataset.teamName, sel.dataset.region, +sel.dataset.seed);
-              input.value = '';
-              list.classList.remove('open');
+              const refocused = document.querySelector('.team-search[data-idx="' + idx + '"]');
+              if (refocused) refocused.focus();
             }
           } else if (e.key === 'Escape') {
             list.classList.remove('open');
