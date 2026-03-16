@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>March Madness Pool</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1 id="title">March Madness Pool</h1>
+    <nav id="main-nav">
+      <select id="year-select" title="Select year"></select>
+      <button class="tab active" data-tab="bracket">Bracket</button>
+      <button class="tab" data-tab="roster">Roster</button>
+    </nav>
+  </header>
+
+  <div id="leaderboard"></div>
+
+  <main>
+    <section id="bracket-view">
+      <div id="region-tabs"></div>
+      <div id="bracket-container"></div>
+    </section>
+
+    <section id="roster-view" class="hidden"></section>
+  </main>
+
+  <div id="score-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div id="score-breakdown"></div>
+    </div>
+  </div>
+
+  <script src="js/espn.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/bracket.js"></script>
+  <script src="js/roster.js"></script>
+</body>
+</html>

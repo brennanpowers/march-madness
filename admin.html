@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - March Madness Pool</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Admin-Specific Styles ── */
+    body { padding-bottom: 60px; }
+
+    #auth-gate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      flex-direction: column;
+      gap: 16px;
+    }
+    #auth-gate h2 { font-size: 1.3rem; }
+    #auth-gate input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 260px;
+    }
+    #auth-gate input:focus { outline: none; border-color: var(--accent); }
+    #auth-gate .error { color: var(--lose); font-size: 0.85rem; min-height: 1.2em; }
+
+    .admin-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .admin-btn:hover { opacity: 0.85; }
+    .admin-btn.secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .admin-btn.secondary:hover { border-color: var(--text-dim); }
+
+    #admin-app { display: none; }
+
+    .admin-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 16px;
+      overflow: hidden;
+    }
+    .admin-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .admin-section-header:hover { background: rgba(255,255,255,0.03); }
+    .admin-section-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .admin-section-header .toggle-icon {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      transition: transform 0.2s;
+    }
+    .admin-section-header.collapsed .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    .admin-section-body {
+      padding: 16px;
+    }
+    .admin-section-body.collapsed {
+      display: none;
+    }
+
+    /* Player Editor */
+    .player-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 10px;
+    }
+
+    /* Draft Roster */
+    .draft-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .draft-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .draft-stat .pip {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .draft-stat .count {
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+    .draft-stat .count.full { color: var(--win); }
+    .draft-stat .count.over { color: var(--lose); }
+
+    .region-draft-section {
+      margin-bottom: 16px;
+    }
+    .region-draft-section:last-child { margin-bottom: 0; }
+    .region-draft-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .team-draft-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 6px;
+    }
+    .team-draft-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      transition: border-color 0.15s;
+    }
+    .team-draft-row img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .team-draft-row .seed {
+      font-weight: 700;
+      color: var(--text-dim);
+      min-width: 20px;
+      text-align: right;
+    }
+    .team-draft-row .team-name {
+      font-weight: 500;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .team-draft-row select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    .team-draft-row select:focus { outline: none; border-color: var(--accent); }
+
+    /* Player team input / typeahead */
+    .player-row-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .player-row-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .player-row-top label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      min-width: 20px;
+    }
+    .player-row-top input[type="text"] {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      min-width: 0;
+      width: 120px;
+    }
+    .player-row-top input[type="text"]:focus { outline: none; border-color: var(--accent); }
+    .player-row-top input[type="color"] {
+      width: 36px;
+      height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      background: none;
+      padding: 2px;
+    }
+    .team-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
+    .team-input-wrap input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    .team-input-wrap input:focus { outline: none; border-color: var(--accent); }
+    .team-input-wrap input::placeholder { color: var(--text-dim); }
+    .typeahead-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 0 6px 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 20;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .typeahead-list.open { display: block; }
+    .typeahead-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .typeahead-item:hover, .typeahead-item.active { background: rgba(0,0,0,0.05); }
+    .typeahead-item img { width: 20px; height: 20px; object-fit: contain; }
+    .typeahead-item .seed { font-weight: 700; color: var(--text-dim); min-width: 16px; text-align: right; }
+    .player-teams-summary {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 0 2px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .player-teams-summary span { white-space: nowrap; }
+
+    /* Final Four Matchups */
+    .ff-matchups-editor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .ff-matchup-pair {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      flex: 1;
+      min-width: 240px;
+    }
+    .ff-matchup-pair h3 {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .ff-matchup-pair select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      width: 100%;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+    .ff-matchup-pair select:focus { outline: none; border-color: var(--accent); }
+    .ff-vs {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 0;
+    }
+
+    /* Export */
+    .export-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .export-area textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.75rem;
+      padding: 12px;
+      border-radius: 6px;
+      resize: vertical;
+      min-height: 200px;
+      max-height: 60vh;
+    }
+    .export-area textarea:focus { outline: none; border-color: var(--accent); }
+    .export-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Status bar */
+    #status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 50;
+    }
+    #status-bar .status-text {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    #status-bar .status-text.success { color: var(--win); }
+
+    @media (max-width: 600px) {
+      .admin-section { margin: 10px; }
+      .admin-section-body { padding: 12px; }
+      .player-grid { grid-template-columns: 1fr; }
+      .team-draft-grid { grid-template-columns: 1fr; }
+      .first-four-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Admin Panel</h1>
+    <nav id="main-nav">
+      <a href="index.html" class="tab">Back to Site</a>
+      <button class="tab" id="logout-btn" style="display:none;">Logout</button>
+    </nav>
+  </header>
+
+  <!-- Auth Gate -->
+  <div id="auth-gate">
+    <h2>Admin Access</h2>
+    <input type="password" id="password-input" placeholder="Enter password" autofocus>
+    <button class="admin-btn" id="auth-submit">Enter</button>
+    <div class="error" id="auth-error"></div>
+  </div>
+
+  <!-- Admin App (hidden until authed) -->
+  <div id="admin-app">
+
+    <!-- Players Section -->
+    <div class="admin-section">
+      <div class="admin-section-header" data-section="players">
+        <h2>Players</h2>
+        <span class="toggle-icon">&#9660;</span>
+      </div>
+      <div class="admin-section-body" id="players-body">
+        <div class="player-grid" id="player-grid"></div>
+      </div>
+    </div>
+
+    <!-- Draft Roster Section -->
+    <div class="admin-section">
+      <div class="admin-section-header" data-section="draft">
+        <h2>Draft Roster</h2>
+        <span class="toggle-icon">&#9660;</span>
+      </div>
+      <div class="admin-section-body" id="draft-body">
+        <div class="draft-stats" id="draft-stats"></div>
+        <div id="draft-regions"></div>
+      </div>
+    </div>
+
+    <!-- Final Four Matchups Section -->
+    <div class="admin-section">
+      <div class="admin-section-header" data-section="finalfour">
+        <h2>Final Four Matchups</h2>
+        <span class="toggle-icon">&#9660;</span>
+      </div>
+      <div class="admin-section-body" id="finalfour-body">
+        <div class="ff-matchups-editor" id="ff-matchups-editor"></div>
+      </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="admin-section">
+      <div class="admin-section-header" data-section="export">
+        <h2>Export JSON</h2>
+        <span class="toggle-icon">&#9660;</span>
+      </div>
+      <div class="admin-section-body" id="export-body">
+        <div class="export-area">
+          <div class="export-buttons">
+            <button class="admin-btn" id="generate-btn">Generate JSON</button>
+            <button class="admin-btn secondary" id="copy-btn" disabled>Copy to Clipboard</button>
+            <button class="admin-btn secondary" id="download-btn" disabled>Download .json</button>
+          </div>
+          <textarea id="export-textarea" readonly placeholder="Click 'Generate JSON' to preview the output..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="status-bar" style="display:none;">
+    <span class="status-text" id="status-text">Ready</span>
+    <button class="admin-btn" id="generate-btn-bar">Generate JSON</button>
+  </div>
+
+  <script>
+    /* ── Constants ── */
+    const ADMIN_PASSWORD = 'marchmadness';
+    const STORAGE_KEY = 'mm_admin_authed';
+    const REGION_NAMES = ['South', 'East', 'Midwest', 'West'];
+
+    let DATA = null;
+
+    /* ── Auth ── */
+
+    function checkAuth() {
+      return localStorage.getItem(STORAGE_KEY) === 'true';
+    }
+
+    function authenticate(password) {
+      if (password === ADMIN_PASSWORD) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        return true;
+      }
+      return false;
+    }
+
+    function logout() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    function showApp() {
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'block';
+      document.getElementById('status-bar').style.display = 'flex';
+      document.getElementById('logout-btn').style.display = '';
+      loadAndRender();
+    }
+
+    document.getElementById('auth-submit').addEventListener('click', function() {
+      var pw = document.getElementById('password-input').value;
+      if (authenticate(pw)) {
+        showApp();
+      } else {
+        document.getElementById('auth-error').textContent = 'Incorrect password.';
+      }
+    });
+
+    document.getElementById('password-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('auth-submit').click();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', logout);
+
+    /* ── Data Loading ── */
+
+    async function loadAndRender() {
+      var year = new URLSearchParams(window.location.search).get('year') || '2026';
+      var resp = await fetch('data/' + year + '.json');
+      DATA = await resp.json();
+      renderAll();
+    }
+
+    function renderAll() {
+      renderPlayers();
+      renderDraft();
+      renderFinalFourMatchups();
+      clearExport();
+    }
+
+    /* ── Section Collapse ── */
+
+    document.querySelectorAll('.admin-section-header').forEach(function(header) {
+      header.addEventListener('click', function() {
+        var body = header.nextElementSibling;
+        header.classList.toggle('collapsed');
+        body.classList.toggle('collapsed');
+      });
+    });
+
+    /* ── Players Editor with Typeahead ── */
+
+    function getAllTeams() {
+      var teams = [];
+      for (var rn of Object.keys(DATA.regions)) {
+        for (var t of DATA.regions[rn]) {
+          teams.push({ name: t.name, seed: t.seed, region: rn, espnId: t.espnId, ref: t });
+        }
+      }
+      return teams;
+    }
+
+    function getPlayerTeams(playerName) {
+      var teams = [];
+      for (var rn of Object.keys(DATA.regions)) {
+        for (var t of DATA.regions[rn]) {
+          if (t.owner === playerName) teams.push(t.name);
+        }
+      }
+      return teams;
+    }
+
+    function renderPlayers() {
+      var grid = document.getElementById('player-grid');
+      grid.innerHTML = DATA.players.map(function(p, i) {
+        var teams = getPlayerTeams(p.name);
+        var summary = teams.length ? teams.join(', ') : '';
+        return '<div class="player-row-wrap">' +
+          '<div class="player-row-top">' +
+            '<label>' + (i + 1) + '</label>' +
+            '<input type="color" value="' + p.color + '" data-idx="' + i + '" class="player-color">' +
+            '<input type="text" value="' + escapeAttr(p.name) + '" data-idx="' + i + '" class="player-name" placeholder="Name" style="width:100px">' +
+            '<div class="team-input-wrap">' +
+              '<input type="text" class="team-search" data-idx="' + i + '" placeholder="Add team...">' +
+              '<div class="typeahead-list" data-idx="' + i + '"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="player-teams-summary" data-idx="' + i + '">' + escapeHtml(summary) + '</div>' +
+        '</div>';
+      }).join('');
+
+      // Name change
+      grid.querySelectorAll('.player-name').forEach(function(input) {
+        input.addEventListener('change', function(e) {
+          var idx = +e.target.dataset.idx;
+          var oldName = DATA.players[idx].name;
+          var newName = e.target.value.trim() || ('Player ' + (idx + 1));
+          DATA.players[idx].name = newName;
+          e.target.value = newName;
+          for (var rn of Object.keys(DATA.regions)) {
+            for (var team of DATA.regions[rn]) {
+              if (team.owner === oldName) team.owner = newName;
+            }
+          }
+          renderDraft();
+          renderPlayers();
+        });
+      });
+
+      // Color change
+      grid.querySelectorAll('.player-color').forEach(function(input) {
+        input.addEventListener('input', function(e) {
+          DATA.players[+e.target.dataset.idx].color = e.target.value;
+          renderDraft();
+        });
+      });
+
+      // Typeahead
+      grid.querySelectorAll('.team-search').forEach(function(input) {
+        var idx = +input.dataset.idx;
+        var list = grid.querySelector('.typeahead-list[data-idx="' + idx + '"]');
+        var activeIndex = -1;
+
+        input.addEventListener('input', function() {
+          var query = input.value.toLowerCase().trim();
+          if (!query) { list.classList.remove('open'); return; }
+          var allTeams = getAllTeams();
+          var matches = allTeams.filter(function(t) {
+            return t.name.toLowerCase().includes(query) && !t.ref.owner;
+          }).slice(0, 8);
+          if (!matches.length) { list.classList.remove('open'); return; }
+          activeIndex = -1;
+          list.innerHTML = matches.map(function(t, mi) {
+            var logo = t.espnId ? '<img src="img/logos/' + t.espnId + '.png" alt="">' : '';
+            return '<div class="typeahead-item" data-team-name="' + escapeAttr(t.name) + '" data-region="' + escapeAttr(t.region) + '" data-seed="' + t.seed + '">' +
+              logo + '<span class="seed">' + t.seed + '</span> ' + escapeHtml(t.name) +
+              '<span style="color:var(--text-dim);font-size:0.7rem;margin-left:auto">' + t.region + '</span>' +
+            '</div>';
+          }).join('');
+          list.classList.add('open');
+
+          list.querySelectorAll('.typeahead-item').forEach(function(item) {
+            item.addEventListener('mousedown', function(e) {
+              e.preventDefault();
+              assignTeam(idx, item.dataset.teamName, item.dataset.region, +item.dataset.seed);
+              input.value = '';
+              list.classList.remove('open');
+            });
+          });
+        });
+
+        input.addEventListener('keydown', function(e) {
+          var items = list.querySelectorAll('.typeahead-item');
+          if (!items.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = Math.min(activeIndex + 1, items.length - 1);
+            items.forEach(function(it, i) { it.classList.toggle('active', i === activeIndex); });
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = Math.max(activeIndex - 1, 0);
+            items.forEach(function(it, i) { it.classList.toggle('active', i === activeIndex); });
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            var sel = activeIndex >= 0 ? items[activeIndex] : items[0];
+            if (sel) {
+              assignTeam(idx, sel.dataset.teamName, sel.dataset.region, +sel.dataset.seed);
+              input.value = '';
+              list.classList.remove('open');
+            }
+          } else if (e.key === 'Escape') {
+            list.classList.remove('open');
+          }
+        });
+
+        input.addEventListener('blur', function() {
+          setTimeout(function() { list.classList.remove('open'); }, 150);
+        });
+      });
+    }
+
+    function assignTeam(playerIdx, teamName, regionName, seed) {
+      var playerName = DATA.players[playerIdx].name;
+      var team = DATA.regions[regionName].find(function(t) {
+        return t.name === teamName && t.seed === seed;
+      });
+      if (team) {
+        team.owner = playerName;
+        renderPlayers();
+        renderDraft();
+        setStatus('Assigned ' + teamName + ' to ' + playerName, true);
+      }
+    }
+
+    /* ── Draft Roster Editor ── */
+
+    function getOwnerCounts() {
+      var counts = {};
+      DATA.players.forEach(function(p) { counts[p.name] = 0; });
+      for (var rn of Object.keys(DATA.regions)) {
+        for (var t of DATA.regions[rn]) {
+          if (t.owner && counts[t.owner] !== undefined) {
+            counts[t.owner]++;
+          }
+        }
+      }
+      return counts;
+    }
+
+    function getPlayerColor(name) {
+      var p = DATA.players.find(function(pl) { return pl.name === name; });
+      return p ? p.color : 'transparent';
+    }
+
+    function renderDraftStats() {
+      var counts = getOwnerCounts();
+      var container = document.getElementById('draft-stats');
+      container.innerHTML = DATA.players.map(function(p) {
+        var count = counts[p.name] || 0;
+        var cls = 'count';
+        if (count === 8) cls += ' full';
+        else if (count > 8) cls += ' over';
+        return '<div class="draft-stat">' +
+          '<span class="pip" style="background:' + p.color + '"></span>' +
+          '<span>' + escapeHtml(p.name) + '</span>' +
+          '<span class="' + cls + '">' + count + '/8</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderDraft() {
+      renderDraftStats();
+      var container = document.getElementById('draft-regions');
+      container.innerHTML = '';
+
+      for (var regionName of REGION_NAMES) {
+        var teams = DATA.regions[regionName];
+        if (!teams) continue;
+
+        var section = document.createElement('div');
+        section.className = 'region-draft-section';
+
+        var title = document.createElement('div');
+        title.className = 'region-draft-title';
+        title.textContent = regionName;
+        section.appendChild(title);
+
+        var grid = document.createElement('div');
+        grid.className = 'team-draft-grid';
+
+        var sorted = teams.slice().sort(function(a, b) { return a.seed - b.seed; });
+
+        for (var team of sorted) {
+          var row = document.createElement('div');
+          row.className = 'team-draft-row';
+          if (team.owner) {
+            row.style.borderColor = getPlayerColor(team.owner);
+            row.style.borderLeftWidth = '3px';
+          }
+
+          var logoSrc = team.espnId
+            ? 'img/logos/' + team.espnId + '.png'
+            : '';
+
+          var options = DATA.players.map(function(p) {
+            return '<option value="' + escapeAttr(p.name) + '" ' + (team.owner === p.name ? 'selected' : '') + '>' + escapeHtml(p.name) + '</option>';
+          }).join('');
+
+          row.innerHTML =
+            (logoSrc ? '<img src="' + logoSrc + '" alt="">' : '<div style="width:28px;height:28px;"></div>') +
+            '<span class="seed">' + team.seed + '</span>' +
+            '<span class="team-name">' + escapeHtml(team.name) + '</span>' +
+            '<select data-region="' + escapeAttr(regionName) + '" data-seed="' + team.seed + '" data-first-four="' + team.firstFour + '">' +
+              '<option value="">Unassigned</option>' +
+              options +
+            '</select>';
+
+          grid.appendChild(row);
+        }
+
+        section.appendChild(grid);
+        container.appendChild(section);
+      }
+
+      // Bind select changes
+      container.querySelectorAll('select').forEach(function(sel) {
+        sel.addEventListener('change', function(e) {
+          var region = e.target.dataset.region;
+          var seed = +e.target.dataset.seed;
+          var isFirstFour = e.target.dataset.firstFour === 'true';
+          var team = DATA.regions[region].find(function(t) {
+            return t.seed === seed && t.firstFour === isFirstFour;
+          });
+          if (team) {
+            team.owner = e.target.value || null;
+            renderDraft();
+            renderPlayers();
+          }
+        });
+      });
+    }
+
+    /* ── Final Four Matchups Editor ── */
+
+    function renderFinalFourMatchups() {
+      var container = document.getElementById('ff-matchups-editor');
+      container.innerHTML = DATA.finalFourMatchups.map(function(pair, i) {
+        return '<div class="ff-matchup-pair">' +
+          '<h3>Semifinal ' + (i + 1) + '</h3>' +
+          '<select data-matchup="' + i + '" data-slot="0">' +
+            REGION_NAMES.map(function(r) {
+              return '<option value="' + r + '" ' + (pair[0] === r ? 'selected' : '') + '>' + r + '</option>';
+            }).join('') +
+          '</select>' +
+          '<div class="ff-vs">vs</div>' +
+          '<select data-matchup="' + i + '" data-slot="1">' +
+            REGION_NAMES.map(function(r) {
+              return '<option value="' + r + '" ' + (pair[1] === r ? 'selected' : '') + '>' + r + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>';
+      }).join('');
+
+      container.querySelectorAll('select').forEach(function(sel) {
+        sel.addEventListener('change', function(e) {
+          var matchup = +e.target.dataset.matchup;
+          var slot = +e.target.dataset.slot;
+          DATA.finalFourMatchups[matchup][slot] = e.target.value;
+        });
+      });
+    }
+
+    /* ── Export ── */
+
+    function buildExportJSON() {
+      return JSON.stringify(DATA, null, 2);
+    }
+
+    function clearExport() {
+      document.getElementById('export-textarea').value = '';
+      document.getElementById('copy-btn').disabled = true;
+      document.getElementById('download-btn').disabled = true;
+    }
+
+    document.getElementById('generate-btn').addEventListener('click', generateExport);
+    document.getElementById('generate-btn-bar').addEventListener('click', generateExport);
+
+    function generateExport() {
+      var json = buildExportJSON();
+      var textarea = document.getElementById('export-textarea');
+      textarea.value = json;
+      document.getElementById('copy-btn').disabled = false;
+      document.getElementById('download-btn').disabled = false;
+      setStatus('JSON generated.', true);
+
+      // Scroll export section into view
+      document.getElementById('export-body').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    document.getElementById('copy-btn').addEventListener('click', function() {
+      var textarea = document.getElementById('export-textarea');
+      navigator.clipboard.writeText(textarea.value).then(function() {
+        setStatus('Copied to clipboard!', true);
+      }).catch(function() {
+        textarea.select();
+        document.execCommand('copy');
+        setStatus('Copied to clipboard!', true);
+      });
+    });
+
+    document.getElementById('download-btn').addEventListener('click', function() {
+      var json = document.getElementById('export-textarea').value;
+      if (!json) return;
+      var year = DATA.year || 2026;
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = year + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatus('Downloaded ' + year + '.json', true);
+    });
+
+    /* ── Status Bar ── */
+
+    var statusTimeout = null;
+    function setStatus(msg, success) {
+      var el = document.getElementById('status-text');
+      el.textContent = msg;
+      el.className = 'status-text' + (success ? ' success' : '');
+      if (statusTimeout) clearTimeout(statusTimeout);
+      statusTimeout = setTimeout(function() {
+        el.textContent = 'Ready';
+        el.className = 'status-text';
+      }, 3000);
+    }
+
+    /* ── Utilities ── */
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    /* ── Init ── */
+
+    if (checkAuth()) {
+      showApp();
+    }
+  </script>
+</body>
+</html>

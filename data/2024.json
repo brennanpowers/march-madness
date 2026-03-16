@@ -1,0 +1,855 @@
+{
+  "year": 2024,
+  "title": "March Madness Pool 2024",
+  "gameDates": [
+    "20240319",
+    "20240320",
+    "20240321",
+    "20240322",
+    "20240323",
+    "20240324",
+    "20240325",
+    "20240326",
+    "20240327",
+    "20240328",
+    "20240329",
+    "20240330",
+    "20240331",
+    "20240402",
+    "20240403",
+    "20240404",
+    "20240406",
+    "20240407",
+    "20240409"
+  ],
+  "players": [
+    {
+      "name": "Player 1",
+      "color": "#d32f2f"
+    },
+    {
+      "name": "Player 2",
+      "color": "#1565c0"
+    },
+    {
+      "name": "Player 3",
+      "color": "#2e7d32"
+    },
+    {
+      "name": "Player 4",
+      "color": "#ef6c00"
+    },
+    {
+      "name": "Player 5",
+      "color": "#7b1fa2"
+    },
+    {
+      "name": "Player 6",
+      "color": "#f5c518"
+    },
+    {
+      "name": "Player 7",
+      "color": "#455a64"
+    },
+    {
+      "name": "Player 8",
+      "color": "#4e342e"
+    }
+  ],
+  "finalFourMatchups": [
+    [
+      "Midwest",
+      "South"
+    ],
+    [
+      "East",
+      "West"
+    ]
+  ],
+  "firstFour": [
+    {
+      "team1": "Montana State",
+      "team1EspnId": "147",
+      "team1Abbrev": "MTST",
+      "team2": "Grambling",
+      "team2EspnId": "2755",
+      "team2Abbrev": "GRAM",
+      "region": "Midwest",
+      "seed": 16,
+      "winner": "Grambling"
+    },
+    {
+      "team1": "Virginia",
+      "team1EspnId": "258",
+      "team1Abbrev": "UVA",
+      "team2": "Colorado State",
+      "team2EspnId": "36",
+      "team2Abbrev": "CSU",
+      "region": "Midwest",
+      "seed": 10,
+      "winner": "Colorado State"
+    },
+    {
+      "team1": "Howard",
+      "team1EspnId": "47",
+      "team1Abbrev": "HOW",
+      "team2": "Wagner",
+      "team2EspnId": "2681",
+      "team2Abbrev": "WAG",
+      "region": "West",
+      "seed": 16,
+      "winner": "Wagner"
+    },
+    {
+      "team1": "Boise State",
+      "team1EspnId": "68",
+      "team1Abbrev": "BOIS",
+      "team2": "Colorado",
+      "team2EspnId": "38",
+      "team2Abbrev": "COLO",
+      "region": "South",
+      "seed": 10,
+      "winner": "Colorado"
+    }
+  ],
+  "regions": {
+    "South": [
+      {
+        "seed": 1,
+        "name": "Houston",
+        "espnId": "248",
+        "abbrev": "HOU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 2,
+        "name": "Marquette",
+        "espnId": "269",
+        "abbrev": "MARQ",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 3,
+        "name": "Kentucky",
+        "espnId": "96",
+        "abbrev": "UK",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 4,
+        "name": "Duke",
+        "espnId": "150",
+        "abbrev": "DUKE",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 5,
+        "name": "Wisconsin",
+        "espnId": "275",
+        "abbrev": "WIS",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 6,
+        "name": "Texas Tech",
+        "espnId": "2641",
+        "abbrev": "TTU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 7,
+        "name": "Florida",
+        "espnId": "57",
+        "abbrev": "FLA",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 8,
+        "name": "Nebraska",
+        "espnId": "158",
+        "abbrev": "NEB",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 9,
+        "name": "Texas A&M",
+        "espnId": "245",
+        "abbrev": "TA&M",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 10,
+        "name": "Colorado",
+        "espnId": "38",
+        "abbrev": "COLO",
+        "owner": null,
+        "firstFour": true
+      },
+      {
+        "seed": 11,
+        "name": "NC State",
+        "espnId": "152",
+        "abbrev": "NCSU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 12,
+        "name": "James Madison",
+        "espnId": "256",
+        "abbrev": "JMU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 13,
+        "name": "Vermont",
+        "espnId": "261",
+        "abbrev": "UVM",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 14,
+        "name": "Oakland",
+        "espnId": "2473",
+        "abbrev": "OAK",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 15,
+        "name": "Western Kentucky",
+        "espnId": "98",
+        "abbrev": "WKU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 16,
+        "name": "Longwood",
+        "espnId": "2344",
+        "abbrev": "LONG",
+        "owner": null,
+        "firstFour": false
+      }
+    ],
+    "East": [
+      {
+        "seed": 1,
+        "name": "UConn",
+        "espnId": "41",
+        "abbrev": "CONN",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 2,
+        "name": "Iowa State",
+        "espnId": "66",
+        "abbrev": "ISU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 3,
+        "name": "Illinois",
+        "espnId": "356",
+        "abbrev": "ILL",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 4,
+        "name": "Auburn",
+        "espnId": "2",
+        "abbrev": "AUB",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 5,
+        "name": "San Diego State",
+        "espnId": "21",
+        "abbrev": "SDSU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 6,
+        "name": "BYU",
+        "espnId": "252",
+        "abbrev": "BYU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 7,
+        "name": "Washington State",
+        "espnId": "265",
+        "abbrev": "WSU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 8,
+        "name": "Florida Atlantic",
+        "espnId": "2226",
+        "abbrev": "FAU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 9,
+        "name": "Northwestern",
+        "espnId": "77",
+        "abbrev": "NU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 10,
+        "name": "Drake",
+        "espnId": "2181",
+        "abbrev": "DRKE",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 11,
+        "name": "Duquesne",
+        "espnId": "2184",
+        "abbrev": "DUQ",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 12,
+        "name": "UAB",
+        "espnId": "5",
+        "abbrev": "UAB",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 13,
+        "name": "Yale",
+        "espnId": "43",
+        "abbrev": "YALE",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 14,
+        "name": "Morehead State",
+        "espnId": "2413",
+        "abbrev": "MORE",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 15,
+        "name": "South Dakota State",
+        "espnId": "2571",
+        "abbrev": "SDST",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 16,
+        "name": "Stetson",
+        "espnId": "56",
+        "abbrev": "STET",
+        "owner": null,
+        "firstFour": false
+      }
+    ],
+    "Midwest": [
+      {
+        "seed": 1,
+        "name": "Purdue",
+        "espnId": "2509",
+        "abbrev": "PUR",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 2,
+        "name": "Tennessee",
+        "espnId": "2633",
+        "abbrev": "TENN",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 3,
+        "name": "Creighton",
+        "espnId": "156",
+        "abbrev": "CREI",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 4,
+        "name": "Kansas",
+        "espnId": "2305",
+        "abbrev": "KU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 5,
+        "name": "Gonzaga",
+        "espnId": "2250",
+        "abbrev": "GONZ",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 6,
+        "name": "South Carolina",
+        "espnId": "2579",
+        "abbrev": "SC",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 7,
+        "name": "Texas",
+        "espnId": "251",
+        "abbrev": "TEX",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 8,
+        "name": "Utah State",
+        "espnId": "328",
+        "abbrev": "USU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 9,
+        "name": "TCU",
+        "espnId": "2628",
+        "abbrev": "TCU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 10,
+        "name": "Colorado State",
+        "espnId": "36",
+        "abbrev": "CSU",
+        "owner": null,
+        "firstFour": true
+      },
+      {
+        "seed": 11,
+        "name": "Oregon",
+        "espnId": "2483",
+        "abbrev": "ORE",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 12,
+        "name": "McNeese",
+        "espnId": "2377",
+        "abbrev": "MCN",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 13,
+        "name": "Samford",
+        "espnId": "2535",
+        "abbrev": "SAM",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 14,
+        "name": "Akron",
+        "espnId": "2006",
+        "abbrev": "AKR",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 15,
+        "name": "Saint Peter's",
+        "espnId": "2612",
+        "abbrev": "SPU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 16,
+        "name": "Grambling",
+        "espnId": "2755",
+        "abbrev": "GRAM",
+        "owner": null,
+        "firstFour": true
+      }
+    ],
+    "West": [
+      {
+        "seed": 1,
+        "name": "North Carolina",
+        "espnId": "153",
+        "abbrev": "UNC",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 2,
+        "name": "Arizona",
+        "espnId": "12",
+        "abbrev": "ARIZ",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 3,
+        "name": "Baylor",
+        "espnId": "239",
+        "abbrev": "BAY",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 4,
+        "name": "Alabama",
+        "espnId": "333",
+        "abbrev": "ALA",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 5,
+        "name": "Saint Mary's",
+        "espnId": "2608",
+        "abbrev": "SMC",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 6,
+        "name": "Clemson",
+        "espnId": "228",
+        "abbrev": "CLEM",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 7,
+        "name": "Dayton",
+        "espnId": "2168",
+        "abbrev": "DAY",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 8,
+        "name": "Mississippi State",
+        "espnId": "344",
+        "abbrev": "MSST",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 9,
+        "name": "Michigan State",
+        "espnId": "127",
+        "abbrev": "MSU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 10,
+        "name": "Nevada",
+        "espnId": "2440",
+        "abbrev": "NEV",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 11,
+        "name": "New Mexico",
+        "espnId": "167",
+        "abbrev": "UNM",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 12,
+        "name": "Grand Canyon",
+        "espnId": "2253",
+        "abbrev": "GCU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 13,
+        "name": "Charleston",
+        "espnId": "232",
+        "abbrev": "COFC",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 14,
+        "name": "Colgate",
+        "espnId": "2142",
+        "abbrev": "COLG",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 15,
+        "name": "Long Beach State",
+        "espnId": "299",
+        "abbrev": "LBSU",
+        "owner": null,
+        "firstFour": false
+      },
+      {
+        "seed": 16,
+        "name": "Wagner",
+        "espnId": "2681",
+        "abbrev": "WAG",
+        "owner": null,
+        "firstFour": true
+      }
+    ]
+  },
+  "results": {
+    "South": {
+      "round1": [
+        "Houston",
+        "Texas A&M",
+        "James Madison",
+        "Duke",
+        "NC State",
+        "Oakland",
+        "Colorado",
+        "Marquette"
+      ],
+      "round2": [
+        "Houston",
+        "Duke",
+        "NC State",
+        "Marquette"
+      ],
+      "sweet16": [
+        "Duke",
+        "NC State"
+      ],
+      "elite8": [
+        "NC State"
+      ]
+    },
+    "East": {
+      "round1": [
+        "UConn",
+        "Northwestern",
+        "San Diego State",
+        "Yale",
+        "Duquesne",
+        "Illinois",
+        "Washington State",
+        "Iowa State"
+      ],
+      "round2": [
+        "UConn",
+        "San Diego State",
+        "Illinois",
+        "Iowa State"
+      ],
+      "sweet16": [
+        "UConn",
+        "Illinois"
+      ],
+      "elite8": [
+        "UConn"
+      ]
+    },
+    "Midwest": {
+      "round1": [
+        "Purdue",
+        "Utah State",
+        "Gonzaga",
+        "Kansas",
+        "Oregon",
+        "Creighton",
+        "Texas",
+        "Tennessee"
+      ],
+      "round2": [
+        "Purdue",
+        "Gonzaga",
+        "Creighton",
+        "Tennessee"
+      ],
+      "sweet16": [
+        "Purdue",
+        "Tennessee"
+      ],
+      "elite8": [
+        "Purdue"
+      ]
+    },
+    "West": {
+      "round1": [
+        "North Carolina",
+        "Michigan State",
+        "Grand Canyon",
+        "Alabama",
+        "Clemson",
+        "Baylor",
+        "Dayton",
+        "Arizona"
+      ],
+      "round2": [
+        "North Carolina",
+        "Alabama",
+        "Clemson",
+        "Arizona"
+      ],
+      "sweet16": [
+        "Alabama",
+        "Clemson"
+      ],
+      "elite8": [
+        "Alabama"
+      ]
+    },
+    "finalFour": [
+      "Purdue",
+      "UConn"
+    ],
+    "championship": [
+      "UConn"
+    ]
+  },
+  "schedule": {
+    "South": {
+      "round1": [
+        "2024-03-23T01:49Z",
+        "2024-03-22T23:00Z",
+        "2024-03-23T01:50Z",
+        "2024-03-22T23:10Z",
+        "2024-03-22T02:10Z",
+        "2024-03-21T23:20Z",
+        "2024-03-22T20:38Z",
+        "2024-03-22T18:00Z"
+      ],
+      "round2": [
+        "2024-03-25T00:40Z",
+        "2024-03-24T21:15Z",
+        "2024-03-23T23:10Z",
+        "2024-03-24T16:10Z"
+      ],
+      "sweet16": [
+        "2024-03-30T01:59Z",
+        "2024-03-29T23:09Z"
+      ],
+      "elite8": [
+        "2024-03-31T21:05Z"
+      ]
+    },
+    "East": {
+      "round1": [
+        "2024-03-22T19:22Z",
+        "2024-03-22T16:15Z",
+        "2024-03-22T17:45Z",
+        "2024-03-22T20:33Z",
+        "2024-03-21T16:40Z",
+        "2024-03-21T19:30Z",
+        "2024-03-22T02:12Z",
+        "2024-03-21T23:35Z"
+      ],
+      "round2": [
+        "2024-03-24T23:45Z",
+        "2024-03-25T02:12Z",
+        "2024-03-24T00:49Z",
+        "2024-03-23T22:10Z"
+      ],
+      "sweet16": [
+        "2024-03-28T23:39Z",
+        "2024-03-29T02:14Z"
+      ],
+      "elite8": [
+        "2024-03-30T22:09Z"
+      ]
+    },
+    "Midwest": {
+      "round1": [
+        "2024-03-22T23:59Z",
+        "2024-03-23T02:30Z",
+        "2024-03-21T23:47Z",
+        "2024-03-22T02:20Z",
+        "2024-03-21T20:00Z",
+        "2024-03-21T17:30Z",
+        "2024-03-21T22:50Z",
+        "2024-03-22T01:20Z"
+      ],
+      "round2": [
+        "2024-03-24T18:47Z",
+        "2024-03-23T19:33Z",
+        "2024-03-24T02:03Z",
+        "2024-03-24T00:25Z"
+      ],
+      "sweet16": [
+        "2024-03-29T23:39Z",
+        "2024-03-30T02:10Z"
+      ],
+      "elite8": [
+        "2024-03-31T18:20Z"
+      ]
+    },
+    "West": {
+      "round1": [
+        "2024-03-21T18:45Z",
+        "2024-03-21T16:15Z",
+        "2024-03-23T02:57Z",
+        "2024-03-23T00:03Z",
+        "2024-03-22T19:10Z",
+        "2024-03-22T16:40Z",
+        "2024-03-21T20:45Z",
+        "2024-03-21T18:00Z"
+      ],
+      "round2": [
+        "2024-03-23T21:45Z",
+        "2024-03-24T23:10Z",
+        "2024-03-24T22:10Z",
+        "2024-03-23T16:45Z"
+      ],
+      "sweet16": [
+        "2024-03-29T01:54Z",
+        "2024-03-28T23:09Z"
+      ],
+      "elite8": [
+        "2024-03-31T00:49Z"
+      ]
+    },
+    "finalFour": [
+      "2024-04-06T22:09Z",
+      "2024-04-07T00:51Z"
+    ],
+    "championship": [
+      "2024-04-09T01:20Z"
+    ]
+  }
+}
