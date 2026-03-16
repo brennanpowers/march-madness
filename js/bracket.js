@@ -146,12 +146,12 @@ function buildTeamSlot(team, winner, showSeed) {
   const logoUrl = teamLogoUrl(team.espnId);
   const cdnUrl = teamLogoCdnUrl(team.espnId);
   const logoImg = logoUrl
-    ? `<img class="team-logo" src="${logoUrl}" alt="" width="18" height="18" loading="lazy" onerror="if(this.src!=='${cdnUrl}')this.src='${cdnUrl}';else this.style.display='none'">`
+    ? `<img class="team-logo" src="${escapeHtml(logoUrl)}" alt="" width="18" height="18" loading="lazy" onerror="if(this.src!=='${escapeHtml(cdnUrl)}')this.src='${escapeHtml(cdnUrl)}';else this.style.display='none'">`
     : '';
   const seedSpan = `<span class="seed">${team.seed}</span>`;
-  const nameSpan = `<span class="team-name">${team.name}</span>`;
+  const nameSpan = `<span class="team-name">${escapeHtml(team.name)}</span>`;
   const ownerSpan = team.owner
-    ? `<span class="owner-tag" style="background:${playerColor};color:#fff">${team.owner}</span>`
+    ? `<span class="owner-tag" style="background:${playerColor};color:#fff">${escapeHtml(team.owner)}</span>`
     : '';
 
   el.innerHTML = logoImg + seedSpan + nameSpan + ownerSpan;

@@ -74,7 +74,6 @@ header h1 {
   overflow-x: auto;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  -webkit-overflow-scrolling: touch;
 }
 .lb-card {
   flex-shrink: 0;
@@ -116,7 +115,6 @@ header h1 {
   gap: 4px;
   padding: 10px 16px;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 .region-tab {
   flex-shrink: 0;
@@ -141,7 +139,6 @@ header h1 {
 #bracket-container {
   padding: 12px 16px;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 .bracket-region {
   display: flex;

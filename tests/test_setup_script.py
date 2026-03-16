@@ -6,7 +6,7 @@ Tests bracket generation logic without making network calls by using
 pre-built test fixtures.
 
 Usage:
-    python3 tests/test-setup-script.py
+    python3 tests/test_setup_script.py
 """
 
 import json
@@ -15,12 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from generate_bracket import ROUND_PATTERNS, PLAYER_COLORS
-
-# Import setup-year module (has hyphen in filename, use importlib)
-from importlib.util import spec_from_file_location, module_from_spec
-setup_spec = spec_from_file_location("setup_year", str(Path(__file__).parent.parent / "scripts" / "setup-year.py"))
-setup_mod = module_from_spec(setup_spec)
-setup_spec.loader.exec_module(setup_mod)
+import setup_year as setup_mod
 
 BRACKET_ORDER = setup_mod.BRACKET_ORDER
 

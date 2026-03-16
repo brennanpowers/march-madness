@@ -30,7 +30,8 @@ async function loadYears() {
     const resp = await fetch('data/years.json');
     const years = await resp.json();
     return years.sort((a, b) => b - a); // newest first
-  } catch {
+  } catch (err) {
+    console.warn('Failed to load years.json:', err);
     return [2026];
   }
 }
@@ -204,10 +205,10 @@ function computeScores() {
 function renderLeaderboard(scores) {
   const el = document.getElementById('leaderboard');
   el.innerHTML = scores.map((p, i) => `
-    <div class="lb-card" data-player="${p.name}" style="background:${hexToRgba(p.color, 0.15)};border:2px solid ${p.color}">
+    <div class="lb-card" data-player="${escapeHtml(p.name)}" style="background:${hexToRgba(p.color, 0.15)};border:2px solid ${p.color}">
       <span class="lb-rank">#${i + 1}</span>
       <span class="lb-pip" style="background:${p.color}"></span>
-      <span class="lb-name">${p.name}</span>
+      <span class="lb-name">${escapeHtml(p.name)}</span>
       <span class="lb-score">${p.score}</span>
     </div>
   `).join('');
@@ -261,14 +262,14 @@ function showScoreBreakdown(player) {
     }).join('');
 
     return `<tr class="${status}">
-      <td><span class="seed">${t.seed}</span> ${t.name}</td>
+      <td><span class="seed">${t.seed}</span> ${escapeHtml(t.name)}</td>
       ${roundCells}
       <td class="pts-total">${t.points}</td>
     </tr>`;
   }).join('');
 
   breakdown.innerHTML = `
-    <h3 style="color:${player.color}">${player.name}</h3>
+    <h3 style="color:${player.color}">${escapeHtml(player.name)}</h3>
     <table class="breakdown-table">
       <thead><tr><th>Team</th>${headerCols}<th>Tot</th></tr></thead>
       <tbody>${rows}</tbody>

@@ -10,8 +10,8 @@ This is the one-stop script to run when setting up a new year. It:
      in the main bracket until their game is decided)
 
 Usage:
-    python3 scripts/setup-year.py [year]
-    python3 scripts/setup-year.py 2026
+    python3 scripts/setup_year.py [year]
+    python3 scripts/setup_year.py 2026
 
 After running:
   - data/<year>.json has the full bracket
@@ -285,7 +285,6 @@ def build_schedule(tournament, all_appearances):
 
 
 ESPN_LOGO_URL = "https://cdn.espn.com/i/teamlogos/ncaa/500/{espn_id}.png"
-HEADERS = {"User-Agent": "Mozilla/5.0"}
 PROJECT_ROOT = Path(__file__).parent.parent
 
 
@@ -419,7 +418,7 @@ def main():
     )
     print(f"  Scheduled {sched_filled}/63 game times")
 
-    with open(data_path, "w") as f:
+    with open(data_path, "w", encoding="utf-8") as f:
         json.dump(tournament, f, indent=2)
     print(f"\n  Written to {data_path}")
 

@@ -1,5 +1,14 @@
 /* ── Shared Utilities ── */
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function hexToRgba(hex, alpha) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -48,7 +57,8 @@ async function fetchEspnScoreboard(date) {
     const resp = await fetch(url);
     if (!resp.ok) return null;
     return await resp.json();
-  } catch {
+  } catch (err) {
+    console.warn('ESPN scoreboard fetch failed:', err);
     return null;
   }
 }
@@ -265,10 +275,6 @@ async function refreshLiveData() {
   LIVE_GAMES = games;
   const updated = applyEspnResults(games);
   return { games, updated };
-}
-
-function formatDate(d) {
-  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function getLiveGame(espnId) {

@@ -38,15 +38,18 @@ Static website for a family March Madness draft pool. Hosted on GitHub Pages at 
 | `js/espn.js` | Shared utilities (`hexToRgba`), ESPN live integration, logo URLs |
 | `data/<year>.json` | Tournament data: teams, draft owners, results, schedule |
 | `data/years.json` | Array of available years (drives the year dropdown) |
+| `data/tournament-year.schema.json` | JSON Schema for `<year>.json` files |
+| `data/years.schema.json` | JSON Schema for `years.json` |
+| `requirements-dev.txt` | Python dev dependencies (`jsonschema`) |
 | `admin.html` | Password-gated (`marchmadness`) admin page for draft roster assignment |
-| `scripts/setup-year.py` | One-stop setup: bracket + logos + results backfill + years manifest |
+| `scripts/setup_year.py` | One-stop setup: bracket + logos + results backfill + years manifest |
 | `scripts/generate_bracket.py` | Core bracket generator (ESPN API → tournament JSON) |
 | `docs/espn-core-v*.wadl` | ESPN API endpoint documentation (machine-readable) |
 
 ## Setup Workflow (New Year)
 
 ```bash
-python3 scripts/setup-year.py 2027
+python3 scripts/setup_year.py 2027
 # → data/2027.json (bracket + schedule + backfilled results if completed)
 # → img/logos/*.png (68 team logos, cached locally)
 # → data/years.json updated
@@ -114,11 +117,14 @@ Team slots use the owner's color: 20% tint + 2px border for winners, 8% tint + 0
 ## Tests
 
 ```bash
-# Data integrity — validates all year JSON files against the schema
-python3 tests/test-data-integrity.py
+# Install dev dependencies (one time)
+pip3 install -r requirements-dev.txt
+
+# Data integrity — validates all year JSON files against JSON Schemas + semantic checks
+python3 tests/test_data_integrity.py
 
 # Setup script — unit tests for backfill, FF detection, schedule building
-python3 tests/test-setup-script.py
+python3 tests/test_setup_script.py
 
 # Scoring engine — open in browser, exercises JS scoring/bracket logic
 open tests/test-scoring.html
@@ -129,3 +135,4 @@ open tests/test-scoring.html
 - **espn-api** — ESPN's undocumented APIs: endpoints, response structures, gotchas, year-to-year headline differences, filtering strategies, logo CDN
 - **admin-page** — Admin page architecture: auth, data flow, two input methods, snapshots, First Four handling, what's excluded
 - **scoring-and-bracket** — Scoring formula, bracket seed order, results array mapping, elimination detection algorithm, winner/loser rendering, CSS alignment trick
+- **json-schemas** — Comprehensive specifications for `years.json` and `<year>.json`: every field, type, constraint, array index mapping, lifecycle, and cross-references

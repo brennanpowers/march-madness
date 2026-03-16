@@ -14,7 +14,11 @@ import json
 import sys
 from pathlib import Path
 
+import jsonschema
+
 PROJECT_ROOT = Path(__file__).parent.parent
+YEARS_SCHEMA = json.loads((PROJECT_ROOT / "data" / "years.schema.json").read_text())
+TOURNAMENT_SCHEMA = json.loads((PROJECT_ROOT / "data" / "tournament-year.schema.json").read_text())
 BRACKET_ORDER = [1, 16, 8, 9, 5, 12, 4, 13, 6, 11, 3, 14, 7, 10, 2, 15]
 ROUND_SIZES = {"round1": 8, "round2": 4, "sweet16": 2, "elite8": 1}
 REGIONS = ["South", "East", "Midwest", "West"]
@@ -36,7 +40,14 @@ def check(condition, msg):
 def test_year(year, data):
     print(f"\n=== {year} ===")
 
-    # Schema
+    # JSON Schema validation
+    try:
+        jsonschema.validate(data, TOURNAMENT_SCHEMA)
+        check(True, "JSON Schema valid")
+    except jsonschema.ValidationError as e:
+        check(False, f"JSON Schema: {e.message} (at {'/'.join(str(p) for p in e.absolute_path)})")
+
+    # Semantic checks
     check(data.get("year") == year, f"year field is {year}")
     check(isinstance(data.get("title"), str) and len(data["title"]) > 0, "title is non-empty string")
     check(isinstance(data.get("players"), list) and len(data["players"]) == 8, "8 players defined")
@@ -146,6 +157,11 @@ def main():
         sys.exit(1)
 
     years = json.loads(years_path.read_text())
+    try:
+        jsonschema.validate(years, YEARS_SCHEMA)
+        check(True, "years.json JSON Schema valid")
+    except jsonschema.ValidationError as e:
+        check(False, f"years.json JSON Schema: {e.message}")
     check(isinstance(years, list) and len(years) > 0, f"years.json has {len(years)} years")
     check(years == sorted(years, reverse=True), "years.json sorted newest-first")
 
