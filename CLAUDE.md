@@ -2,66 +2,115 @@
 
 Static website for a family March Madness draft pool. Hosted on GitHub Pages at `marchmadness.brennanpowers.com`.
 
+## Pool Rules
+
+- 8 players, snake draft, 8 teams each (all 64 teams drafted)
+- Can draft any team at your pick — no position restrictions
+- First Four teams: you draft the slot (both teams), winner goes to your roster
+- Scoring: `seed × round_number` (a 12-seed winning in R64 = 12 pts, in R32 = 24 pts)
+- Most total points wins
+- Drafting the eventual champion also gets a piece of the pot
+
 ## Architecture
 
-- **Pure HTML/CSS/JS** — no build step, no framework
+- **Pure HTML/CSS/JS** — no build step, no framework, no backend
 - **Data-driven** — all tournament data lives in `data/<year>.json`
 - **GitHub Pages** — deploy by pushing to `main`; CNAME file handles custom domain
-- **ESPN API** — unofficial `site.api.espn.com` endpoints for live scores (client-side)
+- **ESPN API** — undocumented client-side endpoints for live scores and results
+- **Static with live overlay** — JSON file is source of truth for rosters/owners; ESPN API overlays live scores and auto-fills results at runtime
+
+## How Updates Work (No Backend)
+
+1. **Draft day (one time)**: Use `admin.html` to assign teams → export JSON → replace `data/<year>.json` → `git push`
+2. **During tournament (automatic)**: Every page load fetches ESPN scoreboards for all game dates, applies finished game results client-side. 60-second auto-refresh for live games.
+3. **First Four winners**: Resolved automatically from ESPN live data — no manual entry needed
+4. **Fallback**: If ESPN is unavailable, manually edit `results` in the JSON and push
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `index.html` | Single-page app with Bracket and Roster tabs |
-| `css/style.css` | Dark theme, responsive, mobile-first |
-| `js/app.js` | Data loading, scoring engine, leaderboard, tabs |
-| `js/bracket.js` | Region bracket rendering with connector lines |
+| `css/style.css` | Light theme, responsive, mobile-first |
+| `js/app.js` | Data loading, scoring engine, leaderboard, tabs, score breakdown |
+| `js/bracket.js` | Region bracket rendering with logos, game times, connectors |
 | `js/roster.js` | Player roster cards with team lists |
-| `data/<year>.json` | Tournament data: teams, draft owners, results |
-| `js/espn.js` | ESPN live data integration, logo URLs, scoreboard fetching |
-| `admin.html` | Password-gated admin page for draft roster assignment |
-| `scripts/setup-year.py` | One-stop setup: bracket + logos + results backfill |
+| `js/espn.js` | Shared utilities (`hexToRgba`), ESPN live integration, logo URLs |
+| `data/<year>.json` | Tournament data: teams, draft owners, results, schedule |
+| `data/years.json` | Array of available years (drives the year dropdown) |
+| `admin.html` | Password-gated (`marchmadness`) admin page for draft roster assignment |
+| `scripts/setup-year.py` | One-stop setup: bracket + logos + results backfill + years manifest |
 | `scripts/generate_bracket.py` | Core bracket generator (ESPN API → tournament JSON) |
+| `docs/espn-core-v*.wadl` | ESPN API endpoint documentation (machine-readable) |
+
+## Setup Workflow (New Year)
+
+```bash
+python3 scripts/setup-year.py 2027
+# → data/2027.json (bracket + schedule + backfilled results if completed)
+# → img/logos/*.png (68 team logos, cached locally)
+# → data/years.json updated
+# Then open admin.html to assign draft rosters, export JSON, git push
+```
 
 ## Data Model
 
 Each year's JSON (`data/2026.json`) contains:
 
+- `year`, `title` — metadata
+- `gameDates[]` — YYYYMMDD strings for every tournament game date (client fetches only these, not brute-force)
 - `players[]` — name + color for each pool participant
-- `gameDates[]` — YYYYMMDD strings for every tournament game date (used by client to avoid brute-force fetching)
-- `regions{}` — 4 regions, each with 16 teams (seed, name, espnId, abbrev, owner, firstFour)
-- `firstFour[]` — First Four play-in game details
-- `results{}` — winners per round per region, plus finalFour and championship
-- `finalFourMatchups` — which regions pair in the Final Four (auto-detected from ESPN data)
+- `regions{}` — 4 regions, each with 16 teams `{seed, name, espnId, abbrev, owner, firstFour}`
+- `firstFour[]` — First Four play-in game details with ESPN IDs for both teams
+- `results{}` — winners per round per region, plus `finalFour` and `championship`
+- `schedule{}` — ISO datetimes per game slot (mirrors `results` structure)
+- `finalFourMatchups` — which regions pair in the FF (auto-detected for completed years, set in admin for current year)
 
 ### Scoring
 
 `points = seed × round_multiplier`
 
-| Round | Multiplier |
-|-------|-----------|
-| Round of 64 | 1 |
-| Round of 32 | 2 |
-| Sweet 16 | 3 |
-| Elite 8 | 4 |
-| Final Four | 5 |
-| Championship | 6 |
+| Round | Key | Multiplier |
+|-------|-----|-----------|
+| Round of 64 | round1 | 1 |
+| Round of 32 | round2 | 2 |
+| Sweet 16 | sweet16 | 3 |
+| Elite 8 | elite8 | 4 |
+| Final Four | finalFour | 5 |
+| Championship | championship | 6 |
 
 ### Results Array Indexing
 
-Each region's `round1` array has 8 slots matching bracket order:
+Each region's `round1` array has 8 slots matching bracket seed order:
 - `[0]`: 1v16 winner, `[1]`: 8v9, `[2]`: 5v12, `[3]`: 4v13, `[4]`: 6v11, `[5]`: 3v14, `[6]`: 7v10, `[7]`: 2v15
 
 Later rounds feed forward: `round2[0]` = winner of `round1[0]` vs `round1[1]`, etc.
 
-## ESPN API Endpoints
+The `schedule` object mirrors this exact structure but stores ISO datetime strings instead of team names.
 
-- Scoreboard: `site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=YYYYMMDD&groups=100`
-- Teams directory: `site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=500`
-- Core events: `sports.core.api.espn.com/v2/sports/basketball/leagues/mens-college-basketball/seasons/{year}/types/3/events`
-- WADL docs: `sports.core.api.espn.com/v2/application.wadl`, `sports.core.api.espn.com/v3/application.wadl`
+### Player Colors
+
+8 maximally distinct colors for light-theme backgrounds:
+
+| # | Name | Hex |
+|---|------|-----|
+| 1 | Red | `#d32f2f` |
+| 2 | Blue | `#1565c0` |
+| 3 | Green | `#2e7d32` |
+| 4 | Orange | `#ef6c00` |
+| 5 | Purple | `#7b1fa2` |
+| 6 | Yellow | `#f5c518` |
+| 7 | Slate | `#455a64` |
+| 8 | Brown | `#4e342e` |
+
+Team slots use the owner's color: 20% tint + 2px border for winners, 8% tint + 0.35 opacity for losers, 10% tint for pending.
+
+## Script Load Order
+
+`espn.js` → `app.js` → `bracket.js` → `roster.js`
+
+`espn.js` must load first because it defines `hexToRgba()` and `teamLogoUrl()` used by all other scripts.
 
 ## Context Index
 
-- **espn-api** — Comprehensive reference for ESPN's undocumented APIs: endpoints, response structures, gotchas, filtering strategies, and logo CDN
+- **espn-api** — Comprehensive reference for ESPN's undocumented APIs: endpoints, response structures, gotchas, year-to-year differences in headline formats, filtering strategies, and logo CDN
