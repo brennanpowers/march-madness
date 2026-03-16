@@ -31,10 +31,25 @@ header {
   flex-wrap: wrap;
   gap: 8px;
 }
-header h1 {
-  font-size: 1.2rem;
+.title-block {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.title-text {
+  font-family: 'Passion One', 'Impact', 'Arial Black', sans-serif;
+  font-size: 2.2rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text);
   white-space: nowrap;
+}
+.title-year {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
 }
 #main-nav { display: flex; gap: 4px; align-items: center; }
 #year-select {
@@ -69,14 +84,15 @@ header h1 {
 /* ── Leaderboard ── */
 #leaderboard {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 10px 16px;
-  overflow-x: auto;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
 .lb-card {
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -415,7 +431,8 @@ header h1 {
 /* ── Responsive ── */
 @media (max-width: 600px) {
   header { padding: 8px 12px; }
-  header h1 { font-size: 1rem; }
+  .title-text { font-size: 1.2rem; }
+  .title-year { font-size: 0.8rem; }
   .tab { padding: 5px 10px; font-size: 0.8rem; }
   #leaderboard { padding: 8px 12px; }
   .lb-card { padding: 4px 8px; gap: 5px; }

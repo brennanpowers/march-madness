@@ -27,7 +27,7 @@ let CURRENT_YEAR = null;
 
 async function loadYears() {
   try {
-    const resp = await fetch('data/years.json');
+    const resp = await fetch(cacheBust('data/years.json'));
     const years = await resp.json();
     return years.sort((a, b) => b - a); // newest first
   } catch (err) {
@@ -51,13 +51,13 @@ function initYearSelect(years) {
 async function loadData() {
   const years = await loadYears();
   const paramYear = new URLSearchParams(window.location.search).get('year');
-  CURRENT_YEAR = paramYear ? parseInt(paramYear, 10) : years[0];
+  CURRENT_YEAR = paramYear ? parseInt(paramYear, 10) : new Date().getFullYear();
   initYearSelect(years);
 
-  const resp = await fetch(`data/${CURRENT_YEAR}.json`);
+  const resp = await fetch(cacheBust(`data/${CURRENT_YEAR}.json`));
   DATA = await resp.json();
-  document.getElementById('title').textContent = DATA.title;
-  document.title = DATA.title;
+  document.getElementById('title-year').textContent = CURRENT_YEAR;
+  document.title = `March Madness Pool ${CURRENT_YEAR}`;
 }
 
 /* ── Scoring ── */

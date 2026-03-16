@@ -1,5 +1,11 @@
 /* ── Shared Utilities ── */
 
+// Cache-busting: per-minute timestamp so browsers never serve stale JSON
+function cacheBust(url) {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}_=${Math.floor(Date.now() / 60000)}`;
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return String(str)

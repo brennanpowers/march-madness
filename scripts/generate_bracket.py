@@ -26,7 +26,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 PLAYER_COLORS = [
     "#d32f2f", "#1565c0", "#2e7d32", "#ef6c00",
-    "#7b1fa2", "#f5c518", "#455a64", "#4e342e",
+    "#7b1fa2", "#f5c518", "#455a64", "#8d4e2a",
 ]
 
 

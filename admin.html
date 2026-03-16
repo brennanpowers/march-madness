@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Admin - March Madness Pool</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -546,13 +549,13 @@
     async function loadAndRender() {
       let years;
       try {
-        const yResp = await fetch('data/years.json');
+        const yResp = await fetch(cacheBust('data/years.json'));
         years = await yResp.json();
       } catch(e) { years = [2026]; }
       years.sort(function(a, b) { return b - a; });
 
       const paramYear = new URLSearchParams(window.location.search).get('year');
-      const currentYear = paramYear ? parseInt(paramYear, 10) : years[0];
+      const currentYear = paramYear ? parseInt(paramYear, 10) : new Date().getFullYear();
 
       const sel = document.getElementById('year-select');
       sel.innerHTML = years.map(function(y) {
@@ -564,7 +567,7 @@
         window.location = url;
       });
 
-      const resp = await fetch('data/' + currentYear + '.json');
+      const resp = await fetch(cacheBust('data/' + currentYear + '.json'));
       DATA = await resp.json();
       renderAll();
     }

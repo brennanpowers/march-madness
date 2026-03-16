@@ -3,12 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>March Madness Pool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Passion+One:wght@700&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header>
-    <h1 id="title">March Madness Pool</h1>
+    <div class="title-block">
+      <h1 class="title-text">March Madness Pool</h1>
+      <span id="title-year" class="title-year"></span>
+    </div>
     <nav id="main-nav">
       <select id="year-select" title="Select year"></select>
       <button class="tab active" data-tab="bracket">Bracket</button>

@@ -104,7 +104,7 @@ The `schedule` object mirrors this exact structure but stores ISO datetime strin
 | 5 | Purple | `#7b1fa2` |
 | 6 | Yellow | `#f5c518` |
 | 7 | Slate | `#455a64` |
-| 8 | Brown | `#4e342e` |
+| 8 | Brown | `#8d4e2a` |
 
 Team slots use the owner's color: 20% tint + 2px border for winners, 8% tint + 0.35 opacity for losers, 10% tint for pending.
 
