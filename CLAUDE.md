@@ -126,4 +126,6 @@ open tests/test-scoring.html
 
 ## Context Index
 
-- **espn-api** — Comprehensive reference for ESPN's undocumented APIs: endpoints, response structures, gotchas, year-to-year differences in headline formats, filtering strategies, and logo CDN
+- **espn-api** — ESPN's undocumented APIs: endpoints, response structures, gotchas, year-to-year headline differences, filtering strategies, logo CDN
+- **admin-page** — Admin page architecture: auth, data flow, two input methods, snapshots, First Four handling, what's excluded
+- **scoring-and-bracket** — Scoring formula, bracket seed order, results array mapping, elimination detection algorithm, winner/loser rendering, CSS alignment trick
