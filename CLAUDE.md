@@ -139,12 +139,16 @@ Team slots use the owner's color: 20% tint + 2px border for winners, 8% tint + 0
 ```bash
 # Install dev dependencies (one time)
 pip3 install -r requirements-dev.txt
+playwright install chromium  # one-time browser download for page load tests
 
 # Data integrity — validates all year JSON files against JSON Schemas + semantic checks
 python3 tests/test_data_integrity.py
 
 # Setup script — unit tests for backfill, FF detection, schedule building
 python3 tests/test_setup_script.py
+
+# Page load — loads index.html and admin.html in headless Chromium, catches runtime JS errors
+python3 tests/test_page_loads.py
 
 # Scoring engine — open in browser, exercises JS scoring/bracket logic
 open tests/test-scoring.html
