@@ -218,7 +218,7 @@ html.zoomed .round { min-width: 255px; }
   font-weight: 600;
 }
 .team-slot.loser {
-  opacity: 0.35;
+  opacity: 0.5;
 }
 .team-slot.empty {
   border-style: dashed;
@@ -457,7 +457,7 @@ html.zoomed .round { min-width: 255px; }
   font-size: 0.8rem;
 }
 .roster-team.eliminated {
-  opacity: 0.35;
+  opacity: 0.5;
   text-decoration: line-through;
 }
 .roster-team.active { font-weight: 600; }
