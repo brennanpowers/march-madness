@@ -13,6 +13,7 @@
 }
 
 html { font-size: 14px; }
+html.zoomed { font-size: 20px; --team-height: 42px; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   background: var(--bg);
@@ -161,6 +162,8 @@ header {
   gap: 0;
   min-height: 540px;
 }
+html.zoomed .round { min-width: 255px; }
+
 .round {
   display: flex;
   flex-direction: column;
@@ -531,6 +534,9 @@ header {
   color: var(--accent);
 }
 
+/* ── Zoom Toggle ── */
+html.zoomed #zoom-toggle { background: var(--accent); color: #fff; border-color: var(--accent); }
+
 /* ── GitHub Link ── */
 .github-link {
   position: fixed;
@@ -558,6 +564,7 @@ header {
   #region-tabs { padding: 8px 12px; }
   #bracket-container { padding: 8px 12px; }
   .round { min-width: 150px; }
+  html.zoomed .round { min-width: 210px; }
   .final-four {
     flex-direction: column;
     gap: 16px;
