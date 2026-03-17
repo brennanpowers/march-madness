@@ -57,7 +57,7 @@ async function loadData() {
   const resp = await fetch(cacheBust(`data/${CURRENT_YEAR}.json`));
   DATA = await resp.json();
   document.getElementById('title-year').textContent = CURRENT_YEAR;
-  document.title = `March Madness Pool ${CURRENT_YEAR}`;
+  document.title = `March Madness ${CURRENT_YEAR}`;
 }
 
 /* ── Scoring ── */
