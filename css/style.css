@@ -214,8 +214,8 @@ html.zoomed .round { min-width: 255px; }
   transition: opacity 0.15s;
 }
 .team-slot:first-child { border-bottom: none; }
-.matchup:has(.team-slot:last-child.winner) .team-slot:first-child { border-bottom: 1px solid var(--border); }
-.team-slot:last-child.winner { border-top: none; }
+.matchup:has(.team-slot:nth-child(2).winner) .team-slot:first-child { border-bottom: 1px solid var(--border); }
+.team-slot:nth-child(2).winner { border-top: none; }
 .team-slot.winner {
   font-weight: 600;
 }
