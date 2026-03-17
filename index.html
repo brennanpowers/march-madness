@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="zoomed">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,6 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>March Madness Pool</title>
+  <script>if (localStorage.getItem('zoom') === '0') document.documentElement.classList.remove('zoomed');</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Passion+One:wght@700&display=swap">
@@ -22,6 +23,7 @@
       <select id="year-select" title="Select year"></select>
       <button class="tab active" data-tab="bracket">Bracket</button>
       <button class="tab" data-tab="roster">Roster</button>
+      <button id="zoom-toggle" class="tab" title="Toggle text size" onclick="(function(){var z=document.documentElement.classList.toggle('zoomed');localStorage.setItem('zoom',z?'1':'0');})()">Aa</button>
     </nav>
   </header>
 

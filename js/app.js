@@ -283,9 +283,9 @@ function showScoreBreakdown(player) {
 /* ── Tab Switching ── */
 
 function initTabs() {
-  document.querySelectorAll('#main-nav .tab').forEach(tab => {
+  document.querySelectorAll('#main-nav .tab[data-tab]').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('#main-nav .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#main-nav .tab[data-tab]').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
 
       const target = tab.dataset.tab;
