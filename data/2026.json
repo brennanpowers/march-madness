@@ -22,35 +22,35 @@
   ],
   "players": [
     {
-      "name": "Player 1",
+      "name": "Mike",
       "color": "#d32f2f"
     },
     {
-      "name": "Player 2",
+      "name": "Pat",
       "color": "#1565c0"
     },
     {
-      "name": "Player 3",
+      "name": "Toom",
       "color": "#2e7d32"
     },
     {
-      "name": "Player 4",
+      "name": "John",
       "color": "#ef6c00"
     },
     {
-      "name": "Player 5",
+      "name": "Brian",
       "color": "#7b1fa2"
     },
     {
-      "name": "Player 6",
+      "name": "Mac",
       "color": "#f5c518"
     },
     {
-      "name": "Player 7",
+      "name": "Russ",
       "color": "#455a64"
     },
     {
-      "name": "Player 8",
+      "name": "Brennan",
       "color": "#8d4e2a"
     }
   ],
@@ -117,7 +117,7 @@
         "name": "Florida",
         "espnId": "57",
         "abbrev": "FLA",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -125,7 +125,7 @@
         "name": "Houston",
         "espnId": "248",
         "abbrev": "HOU",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -133,7 +133,7 @@
         "name": "Illinois",
         "espnId": "356",
         "abbrev": "ILL",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -141,7 +141,7 @@
         "name": "Nebraska",
         "espnId": "158",
         "abbrev": "NEB",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -149,7 +149,7 @@
         "name": "Vanderbilt",
         "espnId": "238",
         "abbrev": "VAN",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -157,7 +157,7 @@
         "name": "North Carolina",
         "espnId": "153",
         "abbrev": "UNC",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -165,7 +165,7 @@
         "name": "Saint Mary's",
         "espnId": "2608",
         "abbrev": "SMC",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -173,7 +173,7 @@
         "name": "Clemson",
         "espnId": "228",
         "abbrev": "CLEM",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -181,7 +181,7 @@
         "name": "Iowa",
         "espnId": "2294",
         "abbrev": "IOWA",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -189,7 +189,7 @@
         "name": "Texas A&M",
         "espnId": "245",
         "abbrev": "TA&M",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -197,7 +197,7 @@
         "name": "VCU",
         "espnId": "2670",
         "abbrev": "VCU",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -205,7 +205,7 @@
         "name": "McNeese",
         "espnId": "2377",
         "abbrev": "MCN",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -213,7 +213,7 @@
         "name": "Troy",
         "espnId": "2653",
         "abbrev": "TROY",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -221,7 +221,7 @@
         "name": "Pennsylvania",
         "espnId": "219",
         "abbrev": "PENN",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -229,7 +229,7 @@
         "name": "Idaho",
         "espnId": "70",
         "abbrev": "IDHO",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -237,7 +237,7 @@
         "name": "Lehigh / Prairie View A&M",
         "espnId": null,
         "abbrev": null,
-        "owner": null,
+        "owner": "Pat",
         "firstFour": true
       }
     ],
@@ -247,7 +247,7 @@
         "name": "Duke",
         "espnId": "150",
         "abbrev": "DUKE",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -255,7 +255,7 @@
         "name": "UConn",
         "espnId": "41",
         "abbrev": "CONN",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -263,7 +263,7 @@
         "name": "Michigan State",
         "espnId": "127",
         "abbrev": "MSU",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -271,7 +271,7 @@
         "name": "Kansas",
         "espnId": "2305",
         "abbrev": "KU",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -279,7 +279,7 @@
         "name": "St. John's",
         "espnId": "2599",
         "abbrev": "SJU",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -287,7 +287,7 @@
         "name": "Louisville",
         "espnId": "97",
         "abbrev": "LOU",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -295,7 +295,7 @@
         "name": "UCLA",
         "espnId": "26",
         "abbrev": "UCLA",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -303,7 +303,7 @@
         "name": "Ohio State",
         "espnId": "194",
         "abbrev": "OSU",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -311,7 +311,7 @@
         "name": "TCU",
         "espnId": "2628",
         "abbrev": "TCU",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -319,7 +319,7 @@
         "name": "UCF",
         "espnId": "2116",
         "abbrev": "UCF",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -327,7 +327,7 @@
         "name": "South Florida",
         "espnId": "58",
         "abbrev": "USF",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -335,7 +335,7 @@
         "name": "Northern Iowa",
         "espnId": "2460",
         "abbrev": "UNI",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -343,7 +343,7 @@
         "name": "California Baptist",
         "espnId": "2856",
         "abbrev": "CBU",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -351,7 +351,7 @@
         "name": "North Dakota State",
         "espnId": "2449",
         "abbrev": "NDSU",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -359,7 +359,7 @@
         "name": "Furman",
         "espnId": "231",
         "abbrev": "FUR",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -367,7 +367,7 @@
         "name": "Siena",
         "espnId": "2561",
         "abbrev": "SIE",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       }
     ],
@@ -377,7 +377,7 @@
         "name": "Michigan",
         "espnId": "130",
         "abbrev": "MICH",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -385,7 +385,7 @@
         "name": "Iowa State",
         "espnId": "66",
         "abbrev": "ISU",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -393,7 +393,7 @@
         "name": "Virginia",
         "espnId": "258",
         "abbrev": "UVA",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -401,7 +401,7 @@
         "name": "Alabama",
         "espnId": "333",
         "abbrev": "ALA",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -409,7 +409,7 @@
         "name": "Texas Tech",
         "espnId": "2641",
         "abbrev": "TTU",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -417,7 +417,7 @@
         "name": "Tennessee",
         "espnId": "2633",
         "abbrev": "TENN",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -425,7 +425,7 @@
         "name": "Kentucky",
         "espnId": "96",
         "abbrev": "UK",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -433,7 +433,7 @@
         "name": "Georgia",
         "espnId": "61",
         "abbrev": "UGA",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -441,7 +441,7 @@
         "name": "Saint Louis",
         "espnId": "139",
         "abbrev": "SLU",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -449,7 +449,7 @@
         "name": "Santa Clara",
         "espnId": "2541",
         "abbrev": "SCU",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -457,7 +457,7 @@
         "name": "SMU / Miami (OH)",
         "espnId": null,
         "abbrev": null,
-        "owner": null,
+        "owner": "Mike",
         "firstFour": true
       },
       {
@@ -465,7 +465,7 @@
         "name": "Akron",
         "espnId": "2006",
         "abbrev": "AKR",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -473,7 +473,7 @@
         "name": "Hofstra",
         "espnId": "2275",
         "abbrev": "HOF",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -481,7 +481,7 @@
         "name": "Wright State",
         "espnId": "2750",
         "abbrev": "WRST",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -489,7 +489,7 @@
         "name": "Tennessee State",
         "espnId": "2634",
         "abbrev": "TNST",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -497,7 +497,7 @@
         "name": "Howard / UMBC",
         "espnId": null,
         "abbrev": null,
-        "owner": null,
+        "owner": "Mike",
         "firstFour": true
       }
     ],
@@ -507,7 +507,7 @@
         "name": "Arizona",
         "espnId": "12",
         "abbrev": "ARIZ",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -515,7 +515,7 @@
         "name": "Purdue",
         "espnId": "2509",
         "abbrev": "PUR",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -523,7 +523,7 @@
         "name": "Gonzaga",
         "espnId": "2250",
         "abbrev": "GONZ",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -531,7 +531,7 @@
         "name": "Arkansas",
         "espnId": "8",
         "abbrev": "ARK",
-        "owner": null,
+        "owner": "Russ",
         "firstFour": false
       },
       {
@@ -539,7 +539,7 @@
         "name": "Wisconsin",
         "espnId": "275",
         "abbrev": "WIS",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -547,7 +547,7 @@
         "name": "BYU",
         "espnId": "252",
         "abbrev": "BYU",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       },
       {
@@ -555,7 +555,7 @@
         "name": "Miami",
         "espnId": "2390",
         "abbrev": "MIA",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -563,7 +563,7 @@
         "name": "Villanova",
         "espnId": "222",
         "abbrev": "VILL",
-        "owner": null,
+        "owner": "Mac",
         "firstFour": false
       },
       {
@@ -571,7 +571,7 @@
         "name": "Utah State",
         "espnId": "328",
         "abbrev": "USU",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -579,7 +579,7 @@
         "name": "Missouri",
         "espnId": "142",
         "abbrev": "MIZ",
-        "owner": null,
+        "owner": "Pat",
         "firstFour": false
       },
       {
@@ -587,7 +587,7 @@
         "name": "NC State / Texas",
         "espnId": null,
         "abbrev": null,
-        "owner": null,
+        "owner": "John",
         "firstFour": true
       },
       {
@@ -595,7 +595,7 @@
         "name": "High Point",
         "espnId": "2272",
         "abbrev": "HPU",
-        "owner": null,
+        "owner": "Mike",
         "firstFour": false
       },
       {
@@ -603,7 +603,7 @@
         "name": "Hawai'i",
         "espnId": "62",
         "abbrev": "HAW",
-        "owner": null,
+        "owner": "Brennan",
         "firstFour": false
       },
       {
@@ -611,7 +611,7 @@
         "name": "Kennesaw State",
         "espnId": "338",
         "abbrev": "KENN",
-        "owner": null,
+        "owner": "John",
         "firstFour": false
       },
       {
@@ -619,7 +619,7 @@
         "name": "Queens University",
         "espnId": "2511",
         "abbrev": "QUC",
-        "owner": null,
+        "owner": "Toom",
         "firstFour": false
       },
       {
@@ -627,7 +627,7 @@
         "name": "Long Island University",
         "espnId": "112358",
         "abbrev": "LIU",
-        "owner": null,
+        "owner": "Brian",
         "firstFour": false
       }
     ]
