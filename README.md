@@ -211,7 +211,9 @@ Add a CNAME record with your DNS provider:
 marchmadness.brennanpowers.com  CNAME  brennanpowers.github.io
 ```
 
-GitHub handles HTTPS automatically via Let's Encrypt once the CNAME is verified.
+**Cloudflare users:** set the proxy status to **DNS only** (gray cloud), not Proxied (orange cloud). Cloudflare's proxy intercepts requests before GitHub can verify the domain and issue the Let's Encrypt cert.
+
+After the CNAME propagates, GitHub verifies the domain and provisions the cert automatically (usually a few minutes). Once the cert is issued, enable **Enforce HTTPS** in repo Settings → Pages.
 
 ### Deploying updates
 
