@@ -14,8 +14,8 @@
     "20260327",
     "20260328",
     "20260329",
+    "20260401",
     "20260402",
-    "20260403",
     "20260404",
     "20260405",
     "20260406"
@@ -77,6 +77,17 @@
       "winner": null
     },
     {
+      "team1": "NC State",
+      "team1EspnId": "152",
+      "team1Abbrev": "NCSU",
+      "team2": "Texas",
+      "team2EspnId": "251",
+      "team2Abbrev": "TEX",
+      "region": "West",
+      "seed": 11,
+      "winner": null
+    },
+    {
       "team1": "Lehigh",
       "team1EspnId": "2329",
       "team1Abbrev": "LEH",
@@ -95,17 +106,6 @@
       "team2EspnId": "193",
       "team2Abbrev": "M-OH",
       "region": "Midwest",
-      "seed": 11,
-      "winner": null
-    },
-    {
-      "team1": "NC State",
-      "team1EspnId": "152",
-      "team1Abbrev": "NCSU",
-      "team2": "Texas",
-      "team2EspnId": "251",
-      "team2Abbrev": "TEX",
-      "region": "West",
       "seed": 11,
       "winner": null
     }
@@ -849,5 +849,6 @@
     "championship": [
       null
     ]
-  }
+  },
+  "gameScores": {}
 }

@@ -238,13 +238,60 @@ header {
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-right: auto;
 }
 .owner-tag {
-  margin-left: auto;
   font-size: 0.65rem;
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Scores & Live ── */
+.team-score {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 0.8rem;
+  min-width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.team-score.live {
+  color: #d32f2f;
+}
+.team-slot.live {
+  border-color: #d32f2f;
+  border-width: 1px 1px 1px 3px;
+}
+.matchup-time.live {
+  color: #d32f2f;
+  font-weight: 700;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── Roster Live ── */
+.roster-team.live {
+  background: rgba(211, 47, 47, 0.06);
+}
+.roster-live {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  background: #d32f2f;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  animation: live-pulse 2s ease-in-out infinite;
+}
+.roster-score-final {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
   flex-shrink: 0;
 }
 
@@ -277,16 +324,35 @@ header {
 /* ── Final Four ── */
 .final-four {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 20px;
-  min-width: 220px;
+  justify-content: center;
+  gap: 0;
+  padding: 30px 16px;
+  min-height: 400px;
 }
-.ff-matchup {
+.ff-col {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+}
+.ff-center {
+  gap: 16px;
+}
+.ff-connector {
+  width: 24px;
+  height: 60px;
+  flex-shrink: 0;
+  position: relative;
+}
+.ff-connector::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }
 .ff-label {
   font-size: 0.7rem;
@@ -303,6 +369,46 @@ header {
   margin-bottom: 4px;
 }
 .final-four .team-slot { min-width: 200px; }
+
+/* ── Champion Display ── */
+.champion-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 24px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: center;
+}
+.champion-trophy {
+  font-size: 2rem;
+  line-height: 1;
+}
+.champion-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+.champion-name {
+  font-family: 'Passion One', 'Impact', 'Arial Black', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.champion-seed {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+.champion-owner {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
 
 /* ── Roster View ── */
 #roster-view {
@@ -425,6 +531,17 @@ header {
   color: var(--accent);
 }
 
+/* ── GitHub Link ── */
+.github-link {
+  position: fixed;
+  bottom: 10px;
+  right: 14px;
+  color: var(--text-dim);
+  opacity: 0.3;
+  transition: opacity 0.15s;
+}
+.github-link:hover { opacity: 0.8; }
+
 /* ── Utilities ── */
 .hidden { display: none !important; }
 
@@ -434,13 +551,22 @@ header {
   .title-text { font-size: 1.2rem; }
   .title-year { font-size: 0.8rem; }
   .tab { padding: 5px 10px; font-size: 0.8rem; }
-  #leaderboard { padding: 8px 12px; }
+  #leaderboard { padding: 8px 12px; display: grid; grid-template-columns: 1fr 1fr; }
   .lb-card { padding: 4px 8px; gap: 5px; }
   .lb-name { font-size: 0.75rem; }
   .lb-score { font-size: 0.85rem; }
   #region-tabs { padding: 8px 12px; }
   #bracket-container { padding: 8px 12px; }
   .round { min-width: 150px; }
+  .final-four {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 12px;
+    min-height: auto;
+  }
+  .ff-connector { display: none; }
+  .champion-logo { width: 36px; height: 36px; }
+  .champion-name { font-size: 1.1rem; }
   .team-slot { font-size: 0.7rem; padding: 0 6px; }
   #roster-view {
     grid-template-columns: 1fr;

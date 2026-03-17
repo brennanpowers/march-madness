@@ -134,7 +134,9 @@ function applyEspnResults(games) {
   let updated = false;
 
   for (const game of games) {
-    if (!game.isFinal || !game.region) continue;
+    if (!game.isFinal) continue;
+    // Regional rounds need a region; FF/Championship don't
+    if (!game.region && game.round !== 'finalFour' && game.round !== 'championship') continue;
 
     // Find the winner (higher score)
     const sorted = [...game.teams].sort((a, b) => b.score - a.score);
@@ -248,9 +250,21 @@ function findResultSlot(game, winnerName) {
 // Store live game data for display (scores, clock, etc.)
 let LIVE_GAMES = [];
 
+function isTournamentActive() {
+  // Only fetch ESPN data if today falls within the tournament's date range
+  const dates = DATA.gameDates || [];
+  if (!dates.length) return false;
+  const today = getTodayStr();
+  const firstDate = dates[0];
+  const lastDate = dates[dates.length - 1];
+  // Add 1 real day to last date for the post-final window
+  const last = new Date(`${lastDate.slice(0,4)}-${lastDate.slice(4,6)}-${lastDate.slice(6,8)}`);
+  last.setDate(last.getDate() + 1);
+  const dayAfter = `${last.getFullYear()}${String(last.getMonth()+1).padStart(2,'0')}${String(last.getDate()).padStart(2,'0')}`;
+  return today >= firstDate && today <= dayAfter;
+}
+
 function getTournamentDates() {
-  // Use game dates from the JSON (populated by setup script)
-  // Only include dates up to today (no point fetching future dates)
   const today = getTodayStr();
   const allDates = DATA.gameDates || [];
   return allDates.filter(d => d <= today);
@@ -258,37 +272,74 @@ function getTournamentDates() {
 
 let _fullHistoryLoaded = false;
 
+function hasNullResults() {
+  // Check if any result slot is still null (needs backfilling)
+  const r = DATA.results;
+  for (const region of Object.keys(DATA.regions)) {
+    const rr = r[region];
+    if (!rr) continue;
+    for (const round of Object.values(rr)) {
+      if (round.some(v => v === null)) return true;
+    }
+  }
+  if (r.finalFour?.some(v => v === null)) return true;
+  if (r.championship?.some(v => v === null)) return true;
+  return false;
+}
+
 async function refreshLiveData() {
-  let games;
+  if (!isTournamentActive()) return { games: [], updated: false };
 
   if (!_fullHistoryLoaded) {
-    // First load: fetch ALL tournament dates to build complete history
-    const dates = getTournamentDates();
-    const scoreboards = await Promise.all(
-      dates.map(date => fetchEspnScoreboard(date))
-    );
-    games = scoreboards.flatMap(sb => parseEspnGames(sb));
+    // Only backfill past dates if there are null results to fill
+    if (hasNullResults()) {
+      const today = getTodayStr();
+      const pastDates = getTournamentDates().filter(d => d < today);
+      if (pastDates.length) {
+        const scoreboards = await Promise.all(
+          pastDates.map(date => fetchEspnScoreboard(date))
+        );
+        const allGames = scoreboards.flatMap(sb => parseEspnGames(sb));
+        applyEspnResults(allGames);
+      }
+    }
     _fullHistoryLoaded = true;
-  } else {
-    // Subsequent refreshes: only fetch today (completed games don't change)
-    const todayData = await fetchEspnScoreboard(getTodayStr());
-    games = parseEspnGames(todayData);
-    // Merge with existing LIVE_GAMES (keep historical, update today)
-    const todayIds = new Set(games.map(g => g.id));
-    games = [...LIVE_GAMES.filter(g => !todayIds.has(g.id)), ...games];
   }
 
-  LIVE_GAMES = games;
-  const updated = applyEspnResults(games);
-  return { games, updated };
+  // LIVE_GAMES only holds today's games
+  const todayData = await fetchEspnScoreboard(getTodayStr());
+  LIVE_GAMES = parseEspnGames(todayData);
+  const updated = applyEspnResults(LIVE_GAMES);
+  return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated };
 }
 
 function getLiveGame(espnId) {
-  // Find a live/recent game involving this team
+  // LIVE_GAMES only contains today's games
   for (const game of LIVE_GAMES) {
     if (game.teams.some(t => t.espnId === espnId)) {
       return game;
     }
   }
   return null;
+}
+
+function getTeamScore(game, espnId) {
+  if (!game) return null;
+  const t = game.teams.find(t => t.espnId === espnId);
+  return t ? t.score : null;
+}
+
+// Look up a static score from DATA.gameScores (populated by setup script)
+function getStaticScore(teamName, roundName) {
+  return DATA.gameScores?.[teamName]?.[roundName] ?? null;
+}
+
+function getGameStatusText(game) {
+  if (!game) return '';
+  if (game.isFinal) return 'Final';
+  if (game.isLive) {
+    const half = game.period === 1 ? '1st' : game.period === 2 ? '2nd' : game.period > 2 ? 'OT' : '';
+    return half && game.clock ? `${half} ${game.clock}` : 'LIVE';
+  }
+  return '';
 }

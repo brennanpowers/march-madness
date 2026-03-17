@@ -20,7 +20,7 @@
     "20240404",
     "20240406",
     "20240407",
-    "20240409"
+    "20240408"
   ],
   "players": [
     {
@@ -851,5 +851,277 @@
     "championship": [
       "2024-04-09T01:20Z"
     ]
+  },
+  "gameScores": {
+    "Virginia": {
+      "firstFour": 42
+    },
+    "Colorado State": {
+      "firstFour": 67,
+      "round1": 44
+    },
+    "Howard": {
+      "firstFour": 68
+    },
+    "Wagner": {
+      "firstFour": 71,
+      "round1": 62
+    },
+    "Boise State": {
+      "firstFour": 53
+    },
+    "Colorado": {
+      "firstFour": 60,
+      "round1": 102,
+      "round2": 77
+    },
+    "Montana State": {
+      "firstFour": 81
+    },
+    "Grambling": {
+      "firstFour": 88,
+      "round1": 50
+    },
+    "North Carolina": {
+      "round1": 90,
+      "round2": 85,
+      "sweet16": 87
+    },
+    "Arizona": {
+      "round1": 85,
+      "round2": 78,
+      "sweet16": 72
+    },
+    "Long Beach State": {
+      "round1": 65
+    },
+    "Iowa State": {
+      "round1": 82,
+      "round2": 67,
+      "sweet16": 69
+    },
+    "South Dakota State": {
+      "round1": 65
+    },
+    "Tennessee": {
+      "round1": 83,
+      "round2": 62,
+      "sweet16": 82,
+      "elite8": 66
+    },
+    "Saint Peter's": {
+      "round1": 49
+    },
+    "Creighton": {
+      "round1": 77,
+      "round2": 86,
+      "sweet16": 75
+    },
+    "Akron": {
+      "round1": 60
+    },
+    "Illinois": {
+      "round1": 85,
+      "round2": 89,
+      "sweet16": 72,
+      "elite8": 52
+    },
+    "Morehead State": {
+      "round1": 69
+    },
+    "Kentucky": {
+      "round1": 76
+    },
+    "Oakland": {
+      "round1": 80,
+      "round2": 73
+    },
+    "Kansas": {
+      "round1": 93,
+      "round2": 68
+    },
+    "Samford": {
+      "round1": 89
+    },
+    "Gonzaga": {
+      "round1": 86,
+      "round2": 89,
+      "sweet16": 68
+    },
+    "McNeese": {
+      "round1": 65
+    },
+    "BYU": {
+      "round1": 67
+    },
+    "Duquesne": {
+      "round1": 71,
+      "round2": 63
+    },
+    "South Carolina": {
+      "round1": 73
+    },
+    "Oregon": {
+      "round1": 87,
+      "round2": 73
+    },
+    "Texas Tech": {
+      "round1": 67
+    },
+    "NC State": {
+      "round1": 80,
+      "round2": 79,
+      "sweet16": 67,
+      "elite8": 76,
+      "finalFour": 50
+    },
+    "Dayton": {
+      "round1": 63,
+      "round2": 68
+    },
+    "Nevada": {
+      "round1": 60
+    },
+    "Texas": {
+      "round1": 56,
+      "round2": 58
+    },
+    "Washington State": {
+      "round1": 66,
+      "round2": 56
+    },
+    "Drake": {
+      "round1": 61
+    },
+    "Mississippi State": {
+      "round1": 51
+    },
+    "Michigan State": {
+      "round1": 69,
+      "round2": 69
+    },
+    "UConn": {
+      "round1": 91,
+      "round2": 75,
+      "sweet16": 82,
+      "elite8": 77,
+      "finalFour": 86,
+      "championship": 75
+    },
+    "Stetson": {
+      "round1": 52
+    },
+    "Purdue": {
+      "round1": 78,
+      "round2": 106,
+      "sweet16": 80,
+      "elite8": 72,
+      "finalFour": 63,
+      "championship": 60
+    },
+    "Houston": {
+      "round1": 86,
+      "round2": 100,
+      "sweet16": 51
+    },
+    "Longwood": {
+      "round1": 46
+    },
+    "Marquette": {
+      "round1": 87,
+      "round2": 81,
+      "sweet16": 58
+    },
+    "Western Kentucky": {
+      "round1": 69
+    },
+    "Baylor": {
+      "round1": 92,
+      "round2": 64
+    },
+    "Colgate": {
+      "round1": 67
+    },
+    "Auburn": {
+      "round1": 76
+    },
+    "Yale": {
+      "round1": 78,
+      "round2": 57
+    },
+    "Duke": {
+      "round1": 64,
+      "round2": 93,
+      "sweet16": 54,
+      "elite8": 64
+    },
+    "Vermont": {
+      "round1": 47
+    },
+    "Alabama": {
+      "round1": 109,
+      "round2": 72,
+      "sweet16": 89,
+      "elite8": 89,
+      "finalFour": 72
+    },
+    "Charleston": {
+      "round1": 96
+    },
+    "San Diego State": {
+      "round1": 69,
+      "round2": 85,
+      "sweet16": 52
+    },
+    "UAB": {
+      "round1": 65
+    },
+    "Wisconsin": {
+      "round1": 61
+    },
+    "James Madison": {
+      "round1": 72,
+      "round2": 55
+    },
+    "Saint Mary's": {
+      "round1": 66
+    },
+    "Grand Canyon": {
+      "round1": 75,
+      "round2": 61
+    },
+    "Clemson": {
+      "round1": 77,
+      "round2": 72,
+      "sweet16": 77,
+      "elite8": 82
+    },
+    "New Mexico": {
+      "round1": 56
+    },
+    "Florida": {
+      "round1": 100
+    },
+    "Florida Atlantic": {
+      "round1": 65
+    },
+    "Northwestern": {
+      "round1": 77,
+      "round2": 58
+    },
+    "Nebraska": {
+      "round1": 83
+    },
+    "Texas A&M": {
+      "round1": 98,
+      "round2": 95
+    },
+    "Utah State": {
+      "round1": 88,
+      "round2": 67
+    },
+    "TCU": {
+      "round1": 72
+    }
   }
 }

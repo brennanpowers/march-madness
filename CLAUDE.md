@@ -22,8 +22,8 @@ Static website for a family March Madness draft pool. Hosted on GitHub Pages at 
 ## How Updates Work (No Backend)
 
 1. **Draft day (one time)**: Use `admin.html` to assign teams → export JSON → replace `data/<year>.json` → `git push`
-2. **During tournament (automatic)**: Every page load fetches ESPN scoreboards for all game dates, applies finished game results client-side. 60-second auto-refresh for live games.
-3. **First Four winners**: Resolved automatically from ESPN live data — no manual entry needed
+2. **During tournament**: Run `setup_year.py --update <year>` after each day's games to bake results and scores into the JSON, then `git push`. Between updates, the frontend shows live scores from ESPN on game days (auto-refreshes every 60s). On non-game days and for past tournaments, zero ESPN API calls — everything renders from static JSON.
+3. **First Four winners**: Resolved automatically by `--update` or by the frontend's live ESPN overlay
 4. **Fallback**: If ESPN is unavailable, manually edit `results` in the JSON and push
 
 ## Key Files
@@ -42,31 +42,51 @@ Static website for a family March Madness draft pool. Hosted on GitHub Pages at 
 | `data/years.schema.json` | JSON Schema for `years.json` |
 | `requirements-dev.txt` | Python dev dependencies (`jsonschema`) |
 | `admin.html` | Password-gated (`marchmadness`) admin page for draft roster assignment |
-| `scripts/setup_year.py` | One-stop setup: bracket + logos + results backfill + years manifest |
+| `scripts/setup_year.py` | Full setup (`2027`) or update existing year (`--update 2026`) |
 | `scripts/generate_bracket.py` | Core bracket generator (ESPN API → tournament JSON) |
 | `docs/espn-core-v*.wadl` | ESPN API endpoint documentation (machine-readable) |
 
-## Setup Workflow (New Year)
+## Setup Workflow
+
+### New Year (one-time)
 
 ```bash
 python3 scripts/setup_year.py 2027
-# → data/2027.json (bracket + schedule + backfilled results if completed)
-# → img/logos/*.png (68 team logos, cached locally)
-# → data/years.json updated
-# Then open admin.html to assign draft rosters, export JSON, git push
 ```
+
+Creates `data/2027.json` from scratch, downloads logos, updates `years.json`. Players have default names ("Player 1"–"Player 8") and no owner assignments. Open `admin.html` to assign draft rosters, export JSON, then `git push`.
+
+### During Tournament
+
+```bash
+python3 scripts/setup_year.py --update 2026
+```
+
+Refreshes results, schedule, scores, and First Four winners from ESPN. **Preserves:** player names, colors, owner assignments, Final Four matchup order. Run this after each day's games to bake scores into the JSON. Between updates, the frontend handles live scores from ESPN automatically.
+
+### What `--update` Does vs Doesn't
+
+| Updated | Preserved |
+|---------|-----------|
+| `results` (backfills null slots) | `players` (names, colors) |
+| `schedule` (game times) | Owner assignments on teams |
+| `gameScores` (per-team scores) | `finalFourMatchups` order |
+| `gameDates` (ET-corrected) | |
+| `firstFour` winners | |
+| Team logos (downloads new) | |
 
 ## Data Model
 
 Each year's JSON (`data/2026.json`) contains:
 
 - `year`, `title` — metadata
-- `gameDates[]` — YYYYMMDD strings for every tournament game date (client fetches only these, not brute-force)
+- `gameDates[]` — YYYYMMDD strings in US Eastern time for every tournament game date
 - `players[]` — name + color for each pool participant
 - `regions{}` — 4 regions, each with 16 teams `{seed, name, espnId, abbrev, owner, firstFour}`
 - `firstFour[]` — First Four play-in game details with ESPN IDs for both teams
 - `results{}` — winners per round per region, plus `finalFour` and `championship`
 - `schedule{}` — ISO datetimes per game slot (mirrors `results` structure)
+- `gameScores{}` — per-team scores by round (e.g., `{"Auburn": {"round1": 83, "round2": 82}}`)
 - `finalFourMatchups` — which regions pair in the FF (auto-detected for completed years, set in admin for current year)
 
 ### Scoring
@@ -136,3 +156,4 @@ open tests/test-scoring.html
 - **admin-page** — Admin page architecture: auth, data flow, two input methods, snapshots, First Four handling, what's excluded
 - **scoring-and-bracket** — Scoring formula, bracket seed order, results array mapping, elimination detection algorithm, winner/loser rendering, CSS alignment trick
 - **json-schemas** — Comprehensive specifications for `years.json` and `<year>.json`: every field, type, constraint, array index mapping, lifecycle, and cross-references
+- **setup-update-workflow** — Setup/update scripts, `--update` flag, UTC→ET date conversion, gameScores architecture, ESPN call budget, tournament season workflow

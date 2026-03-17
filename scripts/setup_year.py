@@ -93,23 +93,37 @@ def detect_ff_matchups(tournament, all_appearances):
 
 
 def resolve_first_four(tournament, all_appearances):
-    """For completed First Four games, set the winner and update region teams."""
-    for ff in tournament.get("firstFour", []):
-        if ff["winner"]:
-            continue  # already resolved
+    """For completed First Four games, set the winner and update region teams.
 
-        # Find the FF winner from all appearances
-        for t in all_appearances:
-            if (t["region"] == ff["region"] and t["seed"] == ff["seed"]
-                    and t["round"] == "firstFour" and t.get("winner") is True):
-                ff["winner"] = t["name"]
-                # Update the region team entry
-                for rt in tournament["regions"].get(ff["region"], []):
-                    if rt["seed"] == ff["seed"] and rt["firstFour"]:
-                        rt["name"] = t["name"]
-                        rt["espnId"] = t["espnId"]
-                        rt["abbrev"] = t["abbrev"]
-                break
+    If the winner is already set (from a previous pass or existing data),
+    still patches the region entry — build_regions always creates a
+    "TeamA / TeamB" placeholder that needs to be overwritten.
+    """
+    for ff in tournament.get("firstFour", []):
+        if not ff["winner"]:
+            # Find the FF winner from all appearances
+            for t in all_appearances:
+                if (t["region"] == ff["region"] and t["seed"] == ff["seed"]
+                        and t["round"] == "firstFour" and t.get("winner") is True):
+                    ff["winner"] = t["name"]
+                    break
+
+        # Always patch the region entry if we have a winner
+        # (build_regions may have reset it to a placeholder)
+        if ff["winner"]:
+            winner_app = next(
+                (t for t in all_appearances
+                 if t["region"] == ff["region"] and t["seed"] == ff["seed"]
+                 and t["name"] == ff["winner"]),
+                None
+            )
+            for rt in tournament["regions"].get(ff["region"], []):
+                if rt["seed"] == ff["seed"] and rt.get("firstFour"):
+                    rt["name"] = ff["winner"]
+                    if winner_app:
+                        rt["espnId"] = winner_app["espnId"]
+                        rt["abbrev"] = winner_app["abbrev"]
+                    break
 
 
 def backfill_results(tournament, all_appearances):
@@ -284,6 +298,67 @@ def build_schedule(tournament, all_appearances):
     return schedule
 
 
+SCOREBOARD_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard"
+
+
+def build_game_scores(game_dates, team_directory):
+    """Fetch scores from ESPN scoreboard API for all game dates.
+
+    Returns dict like {"Auburn": {"round1": 82, "round2": 71}, ...}
+    Uses the site API which returns scores inline (unlike the core API).
+    """
+    scores = {}
+
+    for date_str in game_dates:
+        url = f"{SCOREBOARD_API}?dates={date_str}&groups=100&limit=100"
+        data = fetch_json(url)
+        if not data:
+            continue
+
+        for event in data.get("events", []):
+            comp = event.get("competitions", [{}])[0]
+            status = comp.get("status", {}).get("type", {}).get("name", "")
+            if status != "STATUS_FINAL":
+                continue
+
+            # Determine round from notes
+            round_name = None
+            for note in comp.get("notes", []):
+                headline = note.get("headline", "")
+                if "Championship" not in headline:
+                    continue
+                for pattern, rname in ROUND_PATTERNS:
+                    if pattern in headline:
+                        round_name = rname
+                        break
+
+            if not round_name:
+                continue
+
+            for competitor in comp.get("competitors", []):
+                raw_score = competitor.get("score")
+                if raw_score is None:
+                    continue
+                score = int(raw_score) if str(raw_score).isdigit() else None
+                if score is None:
+                    continue
+
+                team_id = str(competitor.get("team", {}).get("id", ""))
+                team_info = team_directory.get(team_id)
+                if not team_info:
+                    name = competitor.get("team", {}).get("location", "")
+                else:
+                    name = team_info["name"]
+
+                if not name:
+                    continue
+                if name not in scores:
+                    scores[name] = {}
+                scores[name][round_name] = score
+
+    return scores
+
+
 ESPN_LOGO_URL = "https://cdn.espn.com/i/teamlogos/ncaa/500/{espn_id}.png"
 PROJECT_ROOT = Path(__file__).parent.parent
 
@@ -364,7 +439,123 @@ def update_years_json(year):
     print(f"\n  Updated years.json: {years}")
 
 
+def update_year(year):
+    """Refresh an existing year's JSON with latest ESPN data.
+
+    Preserves manual fields (players, owners, finalFourMatchups) while
+    updating results, schedule, scores, First Four winners, and logos.
+    """
+    data_path = PROJECT_ROOT / "data" / f"{year}.json"
+    if not data_path.exists():
+        print(f"ERROR: {data_path} not found", file=sys.stderr)
+        sys.exit(1)
+
+    with open(data_path, "r", encoding="utf-8") as f:
+        tournament = json.load(f)
+
+    print(f"=== Updating {year} ===\n")
+
+    # Step 1: Fetch ESPN event data
+    print("Step 1: Fetching ESPN data...")
+    team_directory = build_team_directory()
+    event_urls = get_all_event_urls(year)
+    print(f"  Found {len(event_urls)} postseason events")
+
+    if not event_urls:
+        print("ERROR: No events found.", file=sys.stderr)
+        sys.exit(1)
+
+    all_teams, first_four_games, all_appearances, game_dates = collect_all_teams(event_urls, team_directory, year)
+    print(f"  Found {len(all_teams)} unique team entries")
+
+    # Update gameDates
+    tournament["gameDates"] = game_dates
+
+    # Step 2: Resolve First Four winners
+    # First Four resolution happens in two passes because build_regions (step 7)
+    # rebuilds region entries from scratch with "TeamA / TeamB" placeholders,
+    # discarding the resolved names from pass 1. Pass 2 re-patches them.
+    #
+    # Pass 1: Merge FF data, preserving any manually-set winners from the
+    # existing JSON. Then resolve remaining winners from ESPN appearance data.
+    print("\n  Resolving First Four winners...")
+    existing_ff = {(ff["region"], ff["seed"]): ff for ff in tournament.get("firstFour", [])}
+    for ff in first_four_games:
+        key = (ff["region"], ff["seed"])
+        if key in existing_ff and existing_ff[key].get("winner"):
+            ff["winner"] = existing_ff[key]["winner"]
+    tournament["firstFour"] = first_four_games
+    resolve_first_four(tournament, all_appearances)
+    for ff in tournament.get("firstFour", []):
+        status = ff["winner"] if ff["winner"] else "TBD"
+        print(f"    {ff['team1']} vs {ff['team2']} → {status}")
+
+    # Step 3: Preserve existing Final Four matchups
+    # Never re-detect — the matchup order determines how results.finalFour
+    # is indexed. Changing the order would misalign results.
+    print(f"\n  Final Four matchups: {tournament['finalFourMatchups']}")
+
+    # Step 4: Backfill results (only fills null slots, never overwrites)
+    print("\n  Backfilling results from completed games...")
+    filled = backfill_results(tournament, all_appearances)
+    print(f"  Filled {filled}/63 game results")
+
+    # Step 5: Build schedule
+    print("\n  Building game schedule...")
+    tournament["schedule"] = build_schedule(tournament, all_appearances)
+    sched_filled = sum(
+        1 for r in list(tournament["regions"]) + ["finalFour", "championship"]
+        for v in (tournament["schedule"][r] if isinstance(tournament["schedule"][r], list)
+                  else [v for rnd in tournament["schedule"][r].values() for v in rnd])
+        if v is not None
+    )
+    print(f"  Scheduled {sched_filled}/63 game times")
+
+    # Step 6: Build scores (via site API scoreboard, not core API)
+    print("\n  Building game scores...")
+    tournament["gameScores"] = build_game_scores(game_dates, team_directory)
+    print(f"  Scores for {len(tournament['gameScores'])} teams")
+
+    # Step 7: Rebuild region teams from ESPN data (picks up updated espnId,
+    # abbrev, etc.) but preserve owner assignments from the existing JSON.
+    owners = {}
+    for region_name, teams in tournament["regions"].items():
+        for t in teams:
+            if t.get("owner"):
+                owners[(region_name, t["seed"])] = t["owner"]
+
+    regions = build_regions(all_teams, first_four_games)
+    for region_name, teams in regions.items():
+        for t in teams:
+            key = (region_name, t["seed"])
+            if key in owners:
+                t["owner"] = owners[key]
+    tournament["regions"] = regions
+
+    # Pass 2: build_regions creates "TeamA / TeamB" placeholders for FF slots,
+    # overwriting the resolved names from pass 1. Re-resolve to patch them
+    # back with the known winners.
+    resolve_first_four(tournament, all_appearances)
+
+    with open(data_path, "w", encoding="utf-8") as f:
+        json.dump(tournament, f, indent=2)
+    print(f"\n  Written to {data_path}")
+
+    # Step 8: Download any new logos
+    print("\nStep 8: Downloading logos...")
+    logo_dir = PROJECT_ROOT / "img" / "logos"
+    download_all_logos(tournament, logo_dir)
+
+    print(f"\n=== Update complete for {year} ===")
+
+
 def main():
+    if "--update" in sys.argv:
+        sys.argv.remove("--update")
+        year = int(sys.argv[1]) if len(sys.argv) > 1 else 2026
+        update_year(year)
+        return
+
     year = int(sys.argv[1]) if len(sys.argv) > 1 else 2026
     print(f"=== Setting up March Madness {year} ===\n")
 
@@ -417,6 +608,10 @@ def main():
         if v is not None
     )
     print(f"  Scheduled {sched_filled}/63 game times")
+
+    print("\n  Building game scores...")
+    tournament["gameScores"] = build_game_scores(game_dates, team_directory)
+    print(f"  Scores for {len(tournament['gameScores'])} teams")
 
     with open(data_path, "w", encoding="utf-8") as f:
         json.dump(tournament, f, indent=2)

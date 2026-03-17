@@ -147,6 +147,75 @@ def test_year(year, data):
     for d in dates:
         check(len(d) == 8 and d.isdigit(), f"gameDate '{d}' is YYYYMMDD format")
 
+    # gameScores: winner score > loser score for every completed matchup
+    game_scores = data.get("gameScores", {})
+    if game_scores:
+        teams_by_seed = {}
+        for region_name in REGIONS:
+            teams_by_seed[region_name] = {t["seed"]: t for t in data["regions"].get(region_name, [])}
+
+        for region_name in REGIONS:
+            ordered = [teams_by_seed[region_name].get(s) for s in BRACKET_ORDER]
+            rr = results.get(region_name, {})
+            current_teams = ordered
+
+            for round_name, size in ROUND_SIZES.items():
+                for i in range(size):
+                    winner_name = rr.get(round_name, [None] * size)[i]
+                    if winner_name is None:
+                        continue
+                    top = current_teams[i * 2] if i * 2 < len(current_teams) else None
+                    bot = current_teams[i * 2 + 1] if i * 2 + 1 < len(current_teams) else None
+                    if not top or not bot:
+                        continue
+                    loser_name = bot["name"] if top["name"] == winner_name else top["name"]
+                    w_score = game_scores.get(winner_name, {}).get(round_name)
+                    l_score = game_scores.get(loser_name, {}).get(round_name)
+                    if w_score is not None and l_score is not None:
+                        check(w_score > l_score,
+                              f"{region_name}.{round_name}[{i}]: {winner_name} {w_score} > {loser_name} {l_score}")
+
+                # Advance: build next round's team list from winners
+                next_teams = []
+                for i in range(size):
+                    winner_name = rr.get(round_name, [None] * size)[i]
+                    if winner_name:
+                        wt = next((t for t in data["regions"][region_name] if t["name"] == winner_name), None)
+                        next_teams.append(wt or {"name": winner_name, "seed": "?"})
+                    else:
+                        next_teams.append(None)
+                current_teams = next_teams
+
+        # Final Four
+        ff_matchups = data.get("finalFourMatchups", [])
+        for i, pair in enumerate(ff_matchups):
+            winner_name = results.get("finalFour", [None, None])[i]
+            if not winner_name:
+                continue
+            team1_name = results.get(pair[0], {}).get("elite8", [None])[0]
+            team2_name = results.get(pair[1], {}).get("elite8", [None])[0]
+            if not team1_name or not team2_name:
+                continue
+            loser_name = team2_name if team1_name == winner_name else team1_name
+            w_score = game_scores.get(winner_name, {}).get("finalFour")
+            l_score = game_scores.get(loser_name, {}).get("finalFour")
+            if w_score is not None and l_score is not None:
+                check(w_score > l_score,
+                      f"finalFour[{i}]: {winner_name} {w_score} > {loser_name} {l_score}")
+
+        # Championship
+        champ_winner = results.get("championship", [None])[0]
+        if champ_winner:
+            ff_results = results.get("finalFour", [None, None])
+            champ_teams = [t for t in ff_results if t is not None]
+            champ_loser = next((t for t in champ_teams if t != champ_winner), None)
+            if champ_loser:
+                w_score = game_scores.get(champ_winner, {}).get("championship")
+                l_score = game_scores.get(champ_loser, {}).get("championship")
+                if w_score is not None and l_score is not None:
+                    check(w_score > l_score,
+                          f"championship: {champ_winner} {w_score} > {champ_loser} {l_score}")
+
 
 def main():
     global passed, failed

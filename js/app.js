@@ -307,25 +307,29 @@ async function init() {
   renderBracket();
   renderRoster(scores);
 
-  // Fetch ESPN live data and re-render if results changed
-  const { updated } = await refreshLiveData();
-  if (updated) {
-    scores = computeScores();
-    renderLeaderboard(scores);
-    renderBracket();
-    renderRoster(scores);
-  }
-
-  // Auto-refresh every 60 seconds during live games
-  setInterval(async () => {
-    const { updated } = await refreshLiveData();
+  // Only fetch ESPN data and auto-refresh during an active tournament
+  if (isTournamentActive()) {
+    const { games, updated } = await refreshLiveData();
     if (updated) {
-      const scores = computeScores();
+      scores = computeScores();
       renderLeaderboard(scores);
       renderBracket();
       renderRoster(scores);
     }
-  }, 60_000);
+
+    // Only poll if there are live or scheduled games today
+    if (games.length > 0) {
+      setInterval(async () => {
+        const { updated } = await refreshLiveData();
+        if (updated) {
+          const scores = computeScores();
+          renderLeaderboard(scores);
+          renderBracket();
+          renderRoster(scores);
+        }
+      }, 60_000);
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

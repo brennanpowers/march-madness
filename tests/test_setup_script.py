@@ -227,6 +227,111 @@ check(tournament4["regions"]["South"][15]["name"] == "TeamA", "Region team name 
 check(tournament4["regions"]["South"][15]["espnId"] == "a1", "Region team espnId updated")
 
 
+section("update_year — owner preservation")
+# Simulate what --update does: rebuild regions then restore owners
+tournament5 = make_test_tournament()
+# Assign owners
+for region in ["South", "East", "Midwest", "West"]:
+    for i, t in enumerate(tournament5["regions"][region]):
+        t["owner"] = f"Player{i % 8 + 1}"
+
+# Extract owners the way update_year does
+owners = {}
+for region_name, teams in tournament5["regions"].items():
+    for t in teams:
+        if t.get("owner"):
+            owners[(region_name, t["seed"])] = t["owner"]
+
+check(len(owners) == 64, f"extracted {len(owners)}/64 owners")
+
+# Rebuild regions (simulates build_regions wiping owners)
+from generate_bracket import build_regions
+all_test_teams = {}
+for region in ["South", "East", "Midwest", "West"]:
+    for t in tournament5["regions"][region]:
+        key = (region, t["seed"], t["espnId"])
+        all_test_teams[key] = {
+            "seed": t["seed"], "name": t["name"], "espnId": t["espnId"],
+            "abbrev": t["abbrev"], "region": region, "round": "round1",
+            "winner": None, "score": None, "gameDate": None,
+        }
+
+regions = build_regions(all_test_teams, [])
+# Verify owners are gone after rebuild
+rebuilt_owners = sum(1 for teams in regions.values() for t in teams if t.get("owner"))
+check(rebuilt_owners == 0, "build_regions produces no owners (fresh rebuild)")
+
+# Restore owners the way update_year does
+for region_name, teams in regions.items():
+    for t in teams:
+        key = (region_name, t["seed"])
+        if key in owners:
+            t["owner"] = owners[key]
+
+restored = sum(1 for teams in regions.values() for t in teams if t.get("owner"))
+check(restored == 64, f"restored {restored}/64 owners after rebuild")
+
+# Verify specific owners survived
+check(regions["South"][0]["owner"] == "Player1", f"South seed 1 owner preserved: {regions['South'][0]['owner']}")
+check(regions["East"][7]["owner"] == "Player8", f"East seed 8 owner preserved: {regions['East'][7]['owner']}")
+
+
+section("update_year — FF matchup preservation")
+# Verify that finalFourMatchups order is preserved through update logic
+tournament6 = make_test_tournament()
+tournament6["finalFourMatchups"] = [["Midwest", "West"], ["South", "East"]]
+tournament6["results"]["finalFour"] = ["M1", "S1"]
+tournament6["results"]["championship"] = ["M1"]
+
+# backfill_results should not overwrite existing results
+filled = setup_mod.backfill_results(tournament6, make_test_appearances())
+check(tournament6["finalFourMatchups"] == [["Midwest", "West"], ["South", "East"]],
+      "FF matchups unchanged after backfill")
+check(tournament6["results"]["finalFour"] == ["M1", "S1"],
+      "FF results unchanged (already filled)")
+
+
+section("update_year — First Four two-pass resolution")
+# Simulate the two-pass FF resolution from update_year
+tournament7 = make_test_tournament()
+tournament7["firstFour"] = [
+    {"team1": "TeamA", "team1EspnId": "a1", "team1Abbrev": "TA",
+     "team2": "TeamB", "team2EspnId": "b1", "team2Abbrev": "TB",
+     "region": "South", "seed": 16, "winner": None},
+]
+tournament7["regions"]["South"][15] = {
+    "seed": 16, "name": "TeamA / TeamB", "espnId": None, "abbrev": None,
+    "owner": "Player3", "firstFour": True,
+}
+
+ff_apps = [
+    {"seed": 16, "name": "TeamA", "espnId": "a1", "abbrev": "TA",
+     "region": "South", "round": "firstFour", "winner": True, "score": 72, "gameDate": "2025-03-18T00:00Z"},
+    {"seed": 16, "name": "TeamB", "espnId": "b1", "abbrev": "TB",
+     "region": "South", "round": "firstFour", "winner": False, "score": 65, "gameDate": "2025-03-18T00:00Z"},
+]
+
+# Pass 1: resolve winner
+setup_mod.resolve_first_four(tournament7, ff_apps)
+check(tournament7["firstFour"][0]["winner"] == "TeamA", "Pass 1: FF winner resolved")
+check(tournament7["regions"]["South"][15]["name"] == "TeamA", "Pass 1: region name updated")
+
+# Simulate build_regions wiping the region entry (as update_year does)
+tournament7["regions"]["South"][15] = {
+    "seed": 16, "name": "TeamA / TeamB", "espnId": None, "abbrev": None,
+    "owner": "Player3", "firstFour": True,
+}
+
+# Pass 2: re-resolve after rebuild
+setup_mod.resolve_first_four(tournament7, ff_apps)
+check(tournament7["regions"]["South"][15]["name"] == "TeamA",
+      "Pass 2: region name re-patched after rebuild")
+check(tournament7["regions"]["South"][15]["espnId"] == "a1",
+      "Pass 2: espnId re-patched after rebuild")
+check(tournament7["regions"]["South"][15]["owner"] == "Player3",
+      "Owner survived both passes (not touched by resolve_first_four)")
+
+
 # ── Summary ──
 print(f"\n{'='*40}")
 print(f"\033[{'32' if failed == 0 else '31'}m{passed} passed, {failed} failed\033[0m")

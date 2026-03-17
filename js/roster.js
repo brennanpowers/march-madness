@@ -11,11 +11,28 @@ function renderRoster(scores) {
       const logoImg = logoUrl
         ? `<img class="team-logo" src="${escapeHtml(logoUrl)}" alt="" width="20" height="20" loading="lazy" onerror="if(this.src!=='${escapeHtml(cdnUrl)}')this.src='${escapeHtml(cdnUrl)}';else this.style.display='none'">`
         : '';
+
+      // Live game indicator — only show for games currently in progress
+      let liveHtml = '';
+      let isLiveGame = false;
+      if (team && team.espnId) {
+        for (const game of LIVE_GAMES) {
+          if (!game.isLive) continue;
+          const gt = game.teams.find(gt => gt.espnId === String(team.espnId));
+          if (gt) {
+            liveHtml = `<span class="roster-live">LIVE ${gt.score}</span>`;
+            isLiveGame = true;
+            break;
+          }
+        }
+      }
+
       return `
-        <li class="roster-team ${statusClass}">
+        <li class="roster-team ${statusClass}${isLiveGame ? ' live' : ''}">
           ${logoImg}
           <span class="seed">${t.seed}</span>
           <span class="team-name">${escapeHtml(t.name)}</span>
+          ${liveHtml}
           <span class="region-badge">${escapeHtml(t.region)}</span>
         </li>
       `;

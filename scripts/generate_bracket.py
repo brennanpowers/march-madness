@@ -119,11 +119,20 @@ def parse_event(data, team_directory, year):
     if not data:
         return [], None
 
-    # Extract event date (e.g., "2025-03-20T16:15Z" → "20250320")
+    # Extract event date as YYYYMMDD in US Eastern time.
+    # ESPN scoreboard API indexes by ET date, but the core API returns UTC.
+    # A 9 PM ET game shows as the next day in UTC, so we must convert.
     event_date = None
     raw_date = data.get("date", "")
     if raw_date and len(raw_date) >= 10:
-        event_date = raw_date[:10].replace("-", "")
+        from datetime import datetime, timezone, timedelta
+        try:
+            utc_dt = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+            et_offset = timedelta(hours=-4)  # EDT (tournament is always in March/April)
+            et_dt = utc_dt.astimezone(timezone(et_offset))
+            event_date = et_dt.strftime("%Y%m%d")
+        except (ValueError, TypeError):
+            event_date = raw_date[:10].replace("-", "")
     # Keep full ISO datetime for schedule display
     event_datetime = raw_date or None
 
@@ -177,6 +186,14 @@ def parse_event(data, team_directory, year):
                 else:
                     team_info = {"name": f"Team {team_id}", "displayName": "", "abbrev": ""}
 
+            raw_score = competitor.get("score")
+            if isinstance(raw_score, dict):
+                score = int(raw_score["value"]) if raw_score.get("value") is not None else None
+            elif raw_score is not None and str(raw_score).isdigit():
+                score = int(raw_score)
+            else:
+                score = None
+
             teams_found.append({
                 "seed": seed,
                 "name": team_info.get("name", f"Team {team_id}"),
@@ -186,6 +203,7 @@ def parse_event(data, team_directory, year):
                 "region": region,
                 "round": round_name,
                 "winner": competitor.get("winner", None),
+                "score": score,
                 "gameDate": event_datetime,
             })
     return teams_found, event_date

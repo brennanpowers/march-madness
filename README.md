@@ -2,12 +2,6 @@
 
 A static website for running a family NCAA tournament draft pool. 8 players snake-draft all 64 teams (8 each), then watch points accumulate as their teams win through the bracket. Hosted on GitHub Pages at [marchmadness.brennanpowers.com](https://marchmadness.brennanpowers.com).
 
-[Bracket View Screenshot]
-
-[Roster View Screenshot]
-
-[Leaderboard Screenshot]
-
 ## How It Works
 
 - **No backend.** The site is pure HTML/CSS/JS served from GitHub Pages.
@@ -39,7 +33,7 @@ A static website for running a family NCAA tournament draft pool. 8 players snak
 ### 1. Set up a new year
 
 ```bash
-python3 scripts/setup-year.py 2027
+python3 scripts/setup_year.py 2027
 ```
 
 This single command:
@@ -73,7 +67,7 @@ The site is live at `marchmadness.brennanpowers.com` within a minute or two.
 ## Project Structure
 
 ```
-marchmadness/
+march-madness/
 ├── index.html              # Main site -- bracket + roster tabs, leaderboard, score modal
 ├── admin.html              # Password-gated admin page for draft assignment
 ├── CNAME                   # GitHub Pages custom domain config
@@ -94,11 +88,11 @@ marchmadness/
 ├── img/
 │   └── logos/              # Cached team logo PNGs ({espnId}.png)
 ├── scripts/
-│   ├── setup-year.py       # One-stop setup: bracket + logos + results + years manifest
+│   ├── setup_year.py       # One-stop setup: bracket + logos + results + years manifest
 │   └── generate_bracket.py # Core bracket generator (ESPN API -> tournament JSON)
 ├── tests/
-│   ├── test-data-integrity.py  # Validates all year JSON files against schemas
-│   ├── test-setup-script.py    # Unit tests for setup script
+│   ├── test_data_integrity.py  # Validates all year JSON files against schemas
+│   ├── test_setup_script.py    # Unit tests for setup script
 │   └── test-scoring.html       # Browser-based scoring engine tests
 ├── requirements-dev.txt        # Python dev dependencies (jsonschema)
 └── docs/
@@ -118,7 +112,7 @@ The site uses two of ESPN's undocumented, unauthenticated public APIs. No API ke
 
 ### Setup time (Python scripts, one-time per year)
 
-The `setup-year.py` script uses the **Core API** (`sports.core.api.espn.com/v2`) to build the bracket:
+The `setup_year.py` script uses the **Core API** (`sports.core.api.espn.com/v2`) to build the bracket:
 
 1. Fetches the team directory (ID -> name/abbreviation lookup)
 2. Fetches all postseason events from the Core API (~100-120 events, paginated)
@@ -166,7 +160,7 @@ The admin page supports saving/loading snapshots to localStorage. Useful during 
 The setup script handles past years automatically:
 
 ```bash
-python3 scripts/setup-year.py 2024
+python3 scripts/setup_year.py 2024
 ```
 
 For a completed tournament, the script backfills all results from ESPN's API, so the bracket renders fully populated. The Final Four matchup pairings are auto-detected from completed game data.

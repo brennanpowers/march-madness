@@ -126,6 +126,16 @@
           "description": "Championship game time"
         }
       }
+    },
+    "gameScores": {
+      "type": "object",
+      "description": "Per-team scores by round. Keys are team names, values are objects mapping round names to integer scores.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        }
+      }
     }
   },
   "$defs": {
