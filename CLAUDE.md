@@ -163,3 +163,4 @@ open tests/test-scoring.html
 - **scoring-and-bracket** — Scoring formula, bracket seed order, results array mapping, elimination detection algorithm, winner/loser rendering, CSS alignment trick
 - **json-schemas** — Comprehensive specifications for `years.json` and `<year>.json`: every field, type, constraint, array index mapping, lifecycle, and cross-references
 - **setup-update-workflow** — Setup/update scripts, `--update` flag, UTC→ET date conversion, gameScores architecture, ESPN call budget, tournament season workflow
+- **draft-feature-design** — Pluggable data layer (API vs static JSON fallback), draft page frontend design, self-hosted vs hosted mode. Backend service design lives in `~/Projects/ideas/marchmadness-backend/`
