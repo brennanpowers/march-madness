@@ -123,7 +123,7 @@ function parseEspnGames(scoreboard) {
       region,
       round,
       isFinal: status === 'STATUS_FINAL',
-      isLive: status === 'STATUS_IN_PROGRESS',
+      isLive: status === 'STATUS_IN_PROGRESS' || status === 'STATUS_HALFTIME' || status === 'STATUS_END_PERIOD',
     };
   }).filter(Boolean);
 }
@@ -338,6 +338,7 @@ function getGameStatusText(game) {
   if (!game) return '';
   if (game.isFinal) return 'Final';
   if (game.isLive) {
+    if (game.status === 'STATUS_HALFTIME') return 'Half';
     const half = game.period === 1 ? '1st' : game.period === 2 ? '2nd' : game.period > 2 ? 'OT' : '';
     return half && game.clock ? `${half} ${game.clock}` : 'LIVE';
   }
