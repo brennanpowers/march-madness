@@ -532,6 +532,15 @@ html.zoomed .round { min-width: 255px; }
   padding-top: 8px;
   color: var(--accent);
 }
+.team-game-status {
+  font-style: italic;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.team-game-status.live {
+  color: var(--accent);
+}
 
 /* ── Zoom Toggle ── */
 html.zoomed #zoom-toggle { background: var(--accent); color: #fff; border-color: var(--accent); }

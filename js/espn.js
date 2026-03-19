@@ -92,6 +92,7 @@ function parseEspnGames(scoreboard) {
       return {
         espnId: String(id),
         name: c.team?.displayName || c.team?.location || ourTeam?.name || 'Unknown',
+        shortName: c.team?.location || ourTeam?.name || c.team?.displayName || 'Unknown',
         score: parseInt(c.score, 10) || 0,
         seed: c.curatedRank?.current,
         ourTeam,
@@ -347,7 +348,7 @@ function getGameStatusText(game) {
   }
   if (game.isLive) {
     if (game.status === 'STATUS_HALFTIME') return 'Half';
-    const half = game.period === 1 ? '1st' : game.period === 2 ? '2nd' : otLabel(game.period);
+    const half = game.period === 1 ? '1H' : game.period === 2 ? '2H' : otLabel(game.period);
     return half && game.clock ? `${half} ${game.clock}` : 'LIVE';
   }
   return '';

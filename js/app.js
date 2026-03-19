@@ -60,6 +60,106 @@ async function loadData() {
   document.title = `March Madness ${CURRENT_YEAR}`;
 }
 
+/* ── Game Status for Modal ── */
+
+function getTeamGameStatus(teamName, teamRegion, wins, eliminated) {
+  // Check for a live game first
+  const teamData = getTeamByName(teamName);
+  if (teamData?.espnId) {
+    const liveGame = getLiveGame(String(teamData.espnId));
+    if (liveGame && (liveGame.isLive || liveGame.isFinal)) {
+      const us = liveGame.teams.find(t => t.espnId === String(teamData.espnId));
+      const them = liveGame.teams.find(t => t.espnId !== String(teamData.espnId));
+      if (us && them) {
+        const status = getGameStatusText(liveGame);
+        if (liveGame.isLive) {
+          return `<span class="team-game-status live">vs ${escapeHtml(them.shortName)} ${us.score}-${them.score} ${status}</span>`;
+        }
+        // Final from today's games
+        const result = us.score > them.score ? 'W' : 'L';
+        return `<span class="team-game-status">${escapeHtml(them.shortName)} ${us.score}-${them.score} ${result}</span>`;
+      }
+    }
+  }
+
+  // Fall back to last completed game from static data
+  const allRounds = ['round1', 'round2', 'sweet16', 'elite8', 'finalFour', 'championship'];
+  // Find the last round this team participated in (won or lost)
+  let lastRound = null;
+  if (eliminated) {
+    // They lost the round after their last win
+    const nextIdx = wins.length > 0 ? allRounds.indexOf(wins[wins.length - 1]) + 1 : 0;
+    if (nextIdx < allRounds.length) lastRound = allRounds[nextIdx];
+  } else if (wins.length > 0) {
+    lastRound = wins[wins.length - 1];
+  }
+
+  if (!lastRound) return '';
+
+  // Find the opponent in that round
+  const opponent = findOpponent(teamName, teamRegion, lastRound);
+  if (!opponent) return '';
+
+  const ourScore = getStaticScore(teamName, lastRound);
+  const theirScore = getStaticScore(opponent, lastRound);
+  const result = wins.includes(lastRound) ? 'W' : 'L';
+
+  let scoreText = '';
+  if (ourScore !== null && theirScore !== null) {
+    scoreText = ` ${ourScore}-${theirScore}`;
+  }
+
+  return `<span class="team-game-status">${escapeHtml(opponent)}${scoreText} ${result}</span>`;
+}
+
+function findOpponent(teamName, regionName, roundName) {
+  const regionTeams = DATA.regions[regionName];
+  if (!regionTeams) return null;
+  const teamsBySeed = {};
+  regionTeams.forEach(t => teamsBySeed[t.seed] = t);
+  const ordered = BRACKET_ORDER.map(s => teamsBySeed[s]);
+
+  if (roundName === 'round1') {
+    for (let i = 0; i < 8; i++) {
+      const a = ordered[i * 2];
+      const b = ordered[i * 2 + 1];
+      if (a?.name === teamName) return b?.name;
+      if (b?.name === teamName) return a?.name;
+    }
+  } else if (roundName === 'finalFour') {
+    const ffIdx = DATA.finalFourMatchups.findIndex(pair => pair.includes(regionName));
+    if (ffIdx === -1) return null;
+    const ffResults = DATA.results.finalFour;
+    // The two FF competitors come from the two regions in the matchup
+    const pair = DATA.finalFourMatchups[ffIdx];
+    for (const r of pair) {
+      const elite8Winner = DATA.results[r]?.elite8?.[0];
+      if (elite8Winner && elite8Winner !== teamName) return elite8Winner;
+    }
+  } else if (roundName === 'championship') {
+    const ff = DATA.results.finalFour;
+    for (const name of ff) {
+      if (name && name !== teamName) return name;
+    }
+  } else {
+    // round2, sweet16, elite8 — find via previous round results
+    const prevRound = allRoundsForOpponent[allRoundsForOpponent.indexOf(roundName) - 1];
+    if (!prevRound) return null;
+    const prevResults = DATA.results[regionName]?.[prevRound];
+    const roundResults = DATA.results[regionName]?.[roundName];
+    if (!prevResults || !roundResults) return null;
+
+    for (let i = 0; i < roundResults.length; i++) {
+      const feeder1 = prevResults[i * 2];
+      const feeder2 = prevResults[i * 2 + 1];
+      if (feeder1 === teamName) return feeder2;
+      if (feeder2 === teamName) return feeder1;
+    }
+  }
+  return null;
+}
+const allRoundsForOpponent = ['round1', 'round2', 'sweet16', 'elite8', 'finalFour', 'championship'];
+
 /* ── Scoring ── */
 
 function getTeamByName(name) {
@@ -261,8 +361,9 @@ function showScoreBreakdown(player) {
       return `<td class="round-pts">${pts}</td>`;
     }).join('');
 
+    const gameStatus = getTeamGameStatus(t.name, t.region, t.wins, t.eliminated);
     return `<tr class="${status}">
-      <td><span class="seed">${t.seed}</span> ${escapeHtml(t.name)}</td>
+      <td><span class="seed">${t.seed}</span> <strong>${escapeHtml(t.name)}</strong>${gameStatus ? '<br>' + gameStatus : ''}</td>
       ${roundCells}
       <td class="pts-total">${t.points}</td>
     </tr>`;
