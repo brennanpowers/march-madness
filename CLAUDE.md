@@ -15,7 +15,8 @@ Static website for a family March Madness draft pool. Hosted on GitHub Pages at 
 
 - **Pure HTML/CSS/JS** — no build step, no framework, no backend
 - **Data-driven** — all tournament data lives in `data/<year>.json`
-- **GitHub Pages** — deploy by pushing to `main`; CNAME file handles custom domain
+- **GitHub Pages** — deployed via GitHub Actions workflow on push to `main`; CNAME file handles custom domain
+- **Cache-busting** — Actions workflow replaces `__CACHE_BUST__` placeholders in HTML with the short commit SHA before deploying, so browsers always fetch fresh JS/CSS
 - **ESPN API** — undocumented client-side endpoints for live scores and results
 - **Static with live overlay** — JSON file is source of truth for rosters/owners; ESPN API overlays live scores and auto-fills results at runtime
 
@@ -45,6 +46,7 @@ Static website for a family March Madness draft pool. Hosted on GitHub Pages at 
 | `scripts/setup_year.py` | Full setup (`2027`) or update existing year (`--update 2026`) |
 | `scripts/generate_bracket.py` | Core bracket generator (ESPN API → tournament JSON) |
 | `docs/espn-core-v*.wadl` | ESPN API endpoint documentation (machine-readable) |
+| `.github/workflows/deploy.yml` | GitHub Actions workflow: cache-bust + deploy to Pages |
 
 ## Setup Workflow
 
