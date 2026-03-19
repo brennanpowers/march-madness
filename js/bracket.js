@@ -81,6 +81,7 @@ function buildRegionBracket(regionName) {
                        : (botGame && botGame.round === roundName) ? botGame
                        : null;
       if (matchGame && (matchGame.isLive || matchGame.isFinal)) {
+        if (matchGame.isLive) matchup.classList.add('live');
         const timeEl = document.createElement('div');
         timeEl.className = 'matchup-time' + (matchGame.isLive ? ' live' : '');
         timeEl.textContent = getGameStatusText(matchGame);
@@ -216,7 +217,7 @@ function getPlayerColor(ownerName) {
   return player ? player.color : '#8b949e';
 }
 
-function buildFFMatchupTime(team1, team2, roundName, slotIdx) {
+function buildFFMatchupTime(team1, team2, roundName, slotIdx, matchupEl) {
   const g1 = team1 && team1.espnId ? getLiveGame(String(team1.espnId)) : null;
   const g2 = team2 && team2.espnId ? getLiveGame(String(team2.espnId)) : null;
   const game = (g1 && g1.round === roundName) ? g1
@@ -224,6 +225,7 @@ function buildFFMatchupTime(team1, team2, roundName, slotIdx) {
              : null;
   const el = document.createElement('div');
   if (game && (game.isLive || game.isFinal)) {
+    if (game.isLive && matchupEl) matchupEl.classList.add('live');
     el.className = 'matchup-time' + (game.isLive ? ' live' : '');
     el.textContent = getGameStatusText(game);
   } else {
@@ -274,7 +276,7 @@ function buildFinalFour() {
     left2 || { seed: '?', name: `${pair0[1]} Champion`, owner: null, firstFour: false },
     ffResults[0], true, 'finalFour'
   ));
-  const leftTime = buildFFMatchupTime(left1, left2, 'finalFour', 0);
+  const leftTime = buildFFMatchupTime(left1, left2, 'finalFour', 0, leftMatchup);
   if (leftTime) leftMatchup.appendChild(leftTime);
   leftCol.appendChild(leftMatchup);
   wrapper.appendChild(leftCol);
@@ -308,7 +310,7 @@ function buildFinalFour() {
     champTeam2 || { seed: '?', name: 'Semifinal 2', owner: null, firstFour: false },
     champResult, true, 'championship'
   ));
-  const champTime = buildFFMatchupTime(champTeam1, champTeam2, 'championship', 0);
+  const champTime = buildFFMatchupTime(champTeam1, champTeam2, 'championship', 0, champMatchup);
   if (champTime) champMatchup.appendChild(champTime);
   centerCol.appendChild(champMatchup);
 
@@ -373,7 +375,7 @@ function buildFinalFour() {
     right2 || { seed: '?', name: `${pair1[1]} Champion`, owner: null, firstFour: false },
     ffResults[1], true, 'finalFour'
   ));
-  const rightTime = buildFFMatchupTime(right1, right2, 'finalFour', 1);
+  const rightTime = buildFFMatchupTime(right1, right2, 'finalFour', 1, rightMatchup);
   if (rightTime) rightMatchup.appendChild(rightTime);
   rightCol.appendChild(rightMatchup);
   wrapper.appendChild(rightCol);

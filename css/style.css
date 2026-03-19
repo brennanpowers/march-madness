@@ -262,18 +262,53 @@ html.zoomed .round { min-width: 255px; }
 .team-score.live {
   color: #d32f2f;
 }
+.matchup.live {
+  position: relative;
+  border: 2px solid #d32f2f;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(211, 47, 47, 0.45);
+  animation: live-glow 2s ease-in-out infinite;
+  padding-left: 16px;
+}
+.matchup.live > .team-slot {
+  border-left: none;
+  border-right: none;
+}
+.matchup.live > .team-slot:first-child {
+  border-top: none;
+}
+.matchup.live > .team-slot:last-of-type {
+  border-bottom: none;
+}
+.matchup.live::before {
+  content: 'LIVE';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px 0 0 2px;
+}
 .team-slot.live {
   border-color: #d32f2f;
-  border-width: 1px 1px 1px 3px;
 }
 .matchup-time.live {
   color: #d32f2f;
   font-weight: 700;
-  animation: live-pulse 2s ease-in-out infinite;
 }
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@keyframes live-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(211, 47, 47, 0.45); }
+  50% { box-shadow: 0 0 16px rgba(211, 47, 47, 0.7); }
 }
 
 /* ── Roster Live ── */
