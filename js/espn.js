@@ -334,12 +334,20 @@ function getStaticScore(teamName, roundName) {
   return DATA.gameScores?.[teamName]?.[roundName] ?? null;
 }
 
+function otLabel(period) {
+  if (period <= 2) return '';
+  if (period === 3) return 'OT';
+  return `${period - 2}OT`;
+}
+
 function getGameStatusText(game) {
   if (!game) return '';
-  if (game.isFinal) return 'Final';
+  if (game.isFinal) {
+    return game.period > 2 ? `Final/${otLabel(game.period)}` : 'Final';
+  }
   if (game.isLive) {
     if (game.status === 'STATUS_HALFTIME') return 'Half';
-    const half = game.period === 1 ? '1st' : game.period === 2 ? '2nd' : game.period > 2 ? 'OT' : '';
+    const half = game.period === 1 ? '1st' : game.period === 2 ? '2nd' : otLabel(game.period);
     return half && game.clock ? `${half} ${game.clock}` : 'LIVE';
   }
   return '';
