@@ -1,6 +1,6 @@
 /* ── Bracket Rendering ── */
 
-let _activeRegionTab = null;
+let _activeRegionTab = sessionStorage.getItem('activeRegionTab');
 
 function renderBracket() {
   const regionNames = Object.keys(DATA.regions);
@@ -17,6 +17,7 @@ function renderBracket() {
       tabs.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       _activeRegionTab = tab.dataset.region;
+      sessionStorage.setItem('activeRegionTab', _activeRegionTab);
       showRegion(tab.dataset.region);
     });
   });
