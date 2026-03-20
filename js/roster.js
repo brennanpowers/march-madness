@@ -20,7 +20,10 @@ function renderRoster(scores) {
           if (!game.isLive) continue;
           const gt = game.teams.find(gt => gt.espnId === String(team.espnId));
           if (gt) {
-            liveHtml = `<span class="roster-live">LIVE ${gt.score}</span>`;
+            const opp = game.teams.find(gt2 => gt2.espnId !== String(team.espnId));
+            const oppName = opp ? opp.shortName : '?';
+            const oppScore = opp ? opp.score : '?';
+            liveHtml = `<span class="roster-live">${gt.score}-${oppScore} vs ${escapeHtml(oppName)}</span>`;
             isLiveGame = true;
             break;
           }
@@ -31,8 +34,10 @@ function renderRoster(scores) {
         <li class="roster-team ${statusClass}${isLiveGame ? ' live' : ''}">
           ${logoImg}
           <span class="seed">${t.seed}</span>
-          <span class="team-name">${escapeHtml(t.name)}</span>
-          ${liveHtml}
+          <div class="roster-team-info">
+            <span class="team-name">${escapeHtml(t.name)}</span>
+            ${liveHtml}
+          </div>
           <span class="region-badge">${escapeHtml(t.region)}</span>
         </li>
       `;

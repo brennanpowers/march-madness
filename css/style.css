@@ -499,6 +499,10 @@ html.zoomed .round { min-width: 255px; }
   min-width: 20px;
   text-align: right;
 }
+.roster-team-info {
+  display: flex;
+  flex-direction: column;
+}
 .roster-team .region-badge {
   font-size: 0.65rem;
   color: var(--text-dim);
