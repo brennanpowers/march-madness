@@ -123,8 +123,10 @@ function parseEspnGames(scoreboard) {
       teams,
       region,
       round,
+      gameDate: event.date || null,
       isFinal: status === 'STATUS_FINAL',
       isLive: status === 'STATUS_IN_PROGRESS' || status === 'STATUS_HALFTIME' || status === 'STATUS_END_PERIOD',
+      isScheduled: status === 'STATUS_SCHEDULED',
     };
   }).filter(Boolean);
 }
@@ -272,6 +274,7 @@ function getTournamentDates() {
 }
 
 let _fullHistoryLoaded = false;
+let _upcomingGames = null;
 
 function hasNullResults() {
   // Check if any result slot is still null (needs backfilling)
@@ -307,15 +310,33 @@ async function refreshLiveData() {
     _fullHistoryLoaded = true;
   }
 
-  // LIVE_GAMES only holds today's games
+  // Fetch upcoming game dates once for schedule display
+  if (!_upcomingGames) {
+    const allDates = DATA.gameDates || [];
+    const today2 = getTodayStr();
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() + 8);
+    const cutoffStr = `${cutoff.getFullYear()}${String(cutoff.getMonth()+1).padStart(2,'0')}${String(cutoff.getDate()).padStart(2,'0')}`;
+    const upcomingDates = allDates.filter(d => d > today2 && d <= cutoffStr).slice(0, 2);
+    if (upcomingDates.length) {
+      const upcoming = await Promise.all(
+        upcomingDates.map(date => fetchEspnScoreboard(date))
+      );
+      _upcomingGames = upcoming.flatMap(sb => parseEspnGames(sb));
+    } else {
+      _upcomingGames = [];
+    }
+  }
+
+  // Poll only today's games on each refresh
   const todayData = await fetchEspnScoreboard(getTodayStr());
-  LIVE_GAMES = parseEspnGames(todayData);
+  const todayGames = parseEspnGames(todayData);
+  LIVE_GAMES = [...todayGames, ..._upcomingGames];
   const updated = applyEspnResults(LIVE_GAMES);
   return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated };
 }
 
 function getLiveGame(espnId) {
-  // LIVE_GAMES only contains today's games
   for (const game of LIVE_GAMES) {
     if (game.teams.some(t => t.espnId === espnId)) {
       return game;

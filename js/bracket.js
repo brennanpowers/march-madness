@@ -88,7 +88,7 @@ function buildRegionBracket(regionName) {
         matchup.appendChild(timeEl);
       } else {
         const schedule = DATA.schedule?.[regionName]?.[roundName];
-        const gameDate = schedule?.[matchIdx];
+        const gameDate = schedule?.[matchIdx] || (matchGame?.isScheduled ? matchGame.gameDate : null);
         if (gameDate) {
           const timeEl = document.createElement('div');
           timeEl.className = 'matchup-time';
@@ -230,7 +230,7 @@ function buildFFMatchupTime(team1, team2, roundName, slotIdx, matchupEl) {
     el.textContent = getGameStatusText(game);
   } else {
     const schedule = roundName === 'championship' ? DATA.schedule?.championship : DATA.schedule?.finalFour;
-    const gameDate = schedule?.[slotIdx];
+    const gameDate = schedule?.[slotIdx] || (game?.isScheduled ? game.gameDate : null);
     if (gameDate) {
       el.className = 'matchup-time';
       const winner = roundName === 'championship' ? DATA.results.championship[0]
