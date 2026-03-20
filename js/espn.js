@@ -208,6 +208,21 @@ function applyEspnResults(games) {
   return updated;
 }
 
+function applyEspnScores(games) {
+  if (!DATA.gameScores) DATA.gameScores = {};
+  for (const game of games) {
+    if (!game.isFinal || !game.round) continue;
+    for (const t of game.teams) {
+      if (!t.ourTeam) continue;
+      const name = t.ourTeam.name;
+      if (!DATA.gameScores[name]) DATA.gameScores[name] = {};
+      if (DATA.gameScores[name][game.round] == null) {
+        DATA.gameScores[name][game.round] = t.score;
+      }
+    }
+  }
+}
+
 function findResultSlot(game, winnerName) {
   // Determine which index in the round's result array this game maps to
   const region = game.region;
@@ -316,6 +331,7 @@ async function refreshLiveData() {
     if (pastCount) {
       const pastGames = scoreboards.slice(0, pastCount).flatMap(sb => parseEspnGames(sb));
       applyEspnResults(pastGames);
+      applyEspnScores(pastGames);
     }
     _fullHistoryLoaded = true;
 
@@ -334,6 +350,7 @@ async function refreshLiveData() {
   }
 
   const updated = applyEspnResults(LIVE_GAMES);
+  applyEspnScores(LIVE_GAMES);
   return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated };
 }
 
