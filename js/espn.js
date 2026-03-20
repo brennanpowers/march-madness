@@ -294,44 +294,45 @@ function hasNullResults() {
 async function refreshLiveData() {
   if (!isTournamentActive()) return { games: [], updated: false };
 
-  if (!_fullHistoryLoaded) {
-    // Only backfill past dates if there are null results to fill
-    if (hasNullResults()) {
-      const today = getTodayStr();
-      const pastDates = getTournamentDates().filter(d => d < today);
-      if (pastDates.length) {
-        const scoreboards = await Promise.all(
-          pastDates.map(date => fetchEspnScoreboard(date))
-        );
-        const allGames = scoreboards.flatMap(sb => parseEspnGames(sb));
-        applyEspnResults(allGames);
-      }
-    }
-    _fullHistoryLoaded = true;
-  }
-
-  // Fetch upcoming game dates once for schedule display
-  if (!_upcomingGames) {
+  // First load: fetch history, upcoming, and today all in parallel
+  if (!_fullHistoryLoaded || !_upcomingGames) {
+    const today = getTodayStr();
     const allDates = DATA.gameDates || [];
-    const today2 = getTodayStr();
+
+    const pastDates = hasNullResults() ? allDates.filter(d => d < today) : [];
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() + 8);
     const cutoffStr = `${cutoff.getFullYear()}${String(cutoff.getMonth()+1).padStart(2,'0')}${String(cutoff.getDate()).padStart(2,'0')}`;
-    const upcomingDates = allDates.filter(d => d > today2 && d <= cutoffStr).slice(0, 2);
-    if (upcomingDates.length) {
-      const upcoming = await Promise.all(
-        upcomingDates.map(date => fetchEspnScoreboard(date))
-      );
-      _upcomingGames = upcoming.flatMap(sb => parseEspnGames(sb));
-    } else {
+    const upcomingDates = _upcomingGames ? [] : allDates.filter(d => d > today && d <= cutoffStr).slice(0, 2);
+
+    const allFetchDates = [...pastDates, ...upcomingDates, today];
+    const scoreboards = await Promise.all(
+      allFetchDates.map(date => fetchEspnScoreboard(date))
+    );
+
+    const pastCount = pastDates.length;
+    const upcomingCount = upcomingDates.length;
+
+    if (pastCount) {
+      const pastGames = scoreboards.slice(0, pastCount).flatMap(sb => parseEspnGames(sb));
+      applyEspnResults(pastGames);
+    }
+    _fullHistoryLoaded = true;
+
+    if (upcomingCount) {
+      _upcomingGames = scoreboards.slice(pastCount, pastCount + upcomingCount).flatMap(sb => parseEspnGames(sb));
+    } else if (!_upcomingGames) {
       _upcomingGames = [];
     }
+
+    const todayGames = parseEspnGames(scoreboards[scoreboards.length - 1]);
+    LIVE_GAMES = [...todayGames, ..._upcomingGames];
+  } else {
+    // Subsequent refreshes: only poll today
+    const todayData = await fetchEspnScoreboard(getTodayStr());
+    LIVE_GAMES = [...parseEspnGames(todayData), ..._upcomingGames];
   }
 
-  // Poll only today's games on each refresh
-  const todayData = await fetchEspnScoreboard(getTodayStr());
-  const todayGames = parseEspnGames(todayData);
-  LIVE_GAMES = [...todayGames, ..._upcomingGames];
   const updated = applyEspnResults(LIVE_GAMES);
   return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated };
 }
