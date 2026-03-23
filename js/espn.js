@@ -310,6 +310,7 @@ async function refreshLiveData() {
   if (!isTournamentActive()) return { games: [], updated: false };
 
   // First load: fetch history, upcoming, and today all in parallel
+  let historyUpdated = false;
   if (!_fullHistoryLoaded || !_upcomingGames) {
     const today = getTodayStr();
     const allDates = DATA.gameDates || [];
@@ -330,7 +331,7 @@ async function refreshLiveData() {
 
     if (pastCount) {
       const pastGames = scoreboards.slice(0, pastCount).flatMap(sb => parseEspnGames(sb));
-      applyEspnResults(pastGames);
+      historyUpdated = applyEspnResults(pastGames);
       applyEspnScores(pastGames);
     }
     _fullHistoryLoaded = true;
@@ -351,7 +352,7 @@ async function refreshLiveData() {
 
   const updated = applyEspnResults(LIVE_GAMES);
   applyEspnScores(LIVE_GAMES);
-  return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated };
+  return { games: LIVE_GAMES, updated: LIVE_GAMES.length > 0 || updated || historyUpdated };
 }
 
 function getLiveGame(espnId) {
